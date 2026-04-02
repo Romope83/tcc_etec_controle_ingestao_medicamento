@@ -1,0 +1,39 @@
+## Visual Studio Temp Files and Build Results
+bin/
+obj/
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+## .NET Core / .NET MAUI
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## SQLite Local Database (Project Infrastructure)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+## OS Generated Files
+.DS_Store
+Thumbs.db
+
+## User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Publishing and Secrets
+publish/
+*.pfx
+*.publishsettings
+secrets.json
+*.keystore
+
+## Test Results
+TestResults/
