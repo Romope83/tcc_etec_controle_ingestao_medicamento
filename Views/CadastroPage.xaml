@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IngestaoMed.ViewModels"
+             x:Class="IngestaoMed.Views.CadastroPage"
+             Title="Cadastro de Cuidador"
+             x:DataType="vm:CadastroViewModel">
+
+    <VerticalStackLayout Padding="30" Spacing="15">
+
+        <Label Text="Bem-vindo ao IngestaoMed" 
+               FontSize="24" HorizontalOptions="Center" />
+
+        <Entry Placeholder="Seu Nome" 
+               Text="{Binding Nome}" />
+
+        <Entry Placeholder="Seu E-mail" 
+               Keyboard="Email"
+               Text="{Binding Email}" />
+
+        <Entry Placeholder="Telefone (Opcional)" 
+               Keyboard="Telephone"
+               Text="{Binding Telefone}" />
+
+        <Button Text="Finalizar Cadastro" 
+                Command="{Binding SalvarCadastroCommand}"
+                Margin="0,20,0,0" />
+
+    </VerticalStackLayout>
+</ContentPage>
