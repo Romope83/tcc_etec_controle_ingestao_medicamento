@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using IngestaoMed.Data; // Namespace da pasta Data
+﻿using IngestaoMed.Data; // Namespace da pasta Data
+using IngestaoMed.Services;
+using IngestaoMed.ViewModels;
+using IngestaoMed.Views;
+using Microsoft.Extensions.Logging;
 
 namespace IngestaoMed
 {
@@ -26,7 +29,22 @@ namespace IngestaoMed
             builder.Services.AddSingleton<DatabaseContext>(s =>
                 ActivatorUtilities.CreateInstance<DatabaseContext>(s, dbPath));
 
-            // --------------------------------------
+
+            // --- SERVIÇOS DE NEGÓCIO ---
+
+            // Registra a Interface e a Implementação como Singleton
+            builder.Services.AddSingleton<IAuthService, AuthService>();
+
+
+            // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
+
+            // Usamos Transient para que a tela seja "limpa" toda vez que entrarmos nela
+            builder.Services.AddTransient<CadastroViewModel>();
+            builder.Services.AddTransient<CadastroPage>();
+
+            //  STARTUP:
+            builder.Services.AddSingleton<AppShell>();
+            builder.Services.AddSingleton<App>();
 
 #if DEBUG
             builder.Logging.AddDebug();
