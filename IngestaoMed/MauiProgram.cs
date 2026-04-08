@@ -23,8 +23,8 @@ namespace IngestaoMed
 
             // --- SERVIÇOS DE INFRAESTRUTURA E INTERFACE ---
 
-            // Registre o IDialogService ANTES das ViewModels que dependem dele
             builder.Services.AddSingleton<IDialogService, MauiDialogService>();
+            builder.Services.AddSingleton<INavigationService, NavigationService>();
 
             // Define o caminho do arquivo .db3
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "IngestaoMed.db3");
@@ -41,6 +41,7 @@ namespace IngestaoMed
 
             // Registre as ViewModels
             builder.Services.AddTransient<CadastroViewModel>();
+            builder.Services.AddTransient<LoginViewModel>();
 
             // Registre as Pages
             builder.Services.AddTransient<CadastroPage>();
