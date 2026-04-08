@@ -2,7 +2,7 @@
 using NotNull = SQLite.NotNullAttribute;
 using System.Diagnostics.CodeAnalysis;
 
-namespace IngestaoMed.Models
+namespace IngestaoMed.Core.Models
 {
     [Table("Tratamentos")]
     public class Tratamento

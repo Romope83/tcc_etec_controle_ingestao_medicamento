@@ -1,6 +1,8 @@
-﻿using IngestaoMed.Data; // Namespace da pasta Data
+﻿using IngestaoMed.Core.Data; // Namespace da pasta Data
+using IngestaoMed.Core.Interfaces;
+using IngestaoMed.Core.Services;
+using IngestaoMed.Core.ViewModels;
 using IngestaoMed.Services;
-using IngestaoMed.ViewModels;
 using IngestaoMed.Views;
 using Microsoft.Extensions.Logging;
 
@@ -19,30 +21,31 @@ namespace IngestaoMed
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // --- CONFIGURAÇÃO DO BANCO DE DADOS ---
+            // --- SERVIÇOS DE INFRAESTRUTURA E INTERFACE ---
 
-            // Define o caminho do arquivo .db3 na pasta de dados local do dispositivo
+            // Registre o IDialogService ANTES das ViewModels que dependem dele
+            builder.Services.AddSingleton<IDialogService, MauiDialogService>();
+
+            // Define o caminho do arquivo .db3
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "IngestaoMed.db3");
 
-            // Registra o DatabaseContext como Singleton
-            // O uso de ActivatorUtilities permite passar o dbPath para o construtor
-            builder.Services.AddSingleton<DatabaseContext>(s =>
+            // Registra o Banco
+            builder.Services.AddSingleton<IDatabaseContext>(s =>
                 ActivatorUtilities.CreateInstance<DatabaseContext>(s, dbPath));
-
 
             // --- SERVIÇOS DE NEGÓCIO ---
 
-            // Registra a Interface e a Implementação como Singleton
             builder.Services.AddSingleton<IAuthService, AuthService>();
-
 
             // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
 
-            // Usamos Transient para que a tela seja "limpa" toda vez que entrarmos nela
+            // Registre as ViewModels
             builder.Services.AddTransient<CadastroViewModel>();
+
+            // Registre as Pages
             builder.Services.AddTransient<CadastroPage>();
 
-            //  STARTUP:
+            // STARTUP
             builder.Services.AddSingleton<AppShell>();
             builder.Services.AddSingleton<App>();
 
