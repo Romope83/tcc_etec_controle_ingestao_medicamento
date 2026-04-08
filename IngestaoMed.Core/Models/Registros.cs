@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace IngestaoMed.Models
+namespace IngestaoMed.Core.Models
 {
     [Table("Registros")]
     public class Registro

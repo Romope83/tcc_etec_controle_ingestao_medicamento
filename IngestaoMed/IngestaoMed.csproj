@@ -60,6 +60,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
@@ -68,14 +69,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Data\Repositories\" />
 	  <Folder Include="Interfaces\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\CadastroPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
+	  <ProjectReference Include="..\IngestaoMed.Core\IngestaoMed.Core.csproj" />
 	</ItemGroup>
+
 
 </Project>
