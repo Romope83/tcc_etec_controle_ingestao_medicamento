@@ -76,5 +76,17 @@
 	  <ProjectReference Include="..\IngestaoMed.Core\IngestaoMed.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Views\CadastroMedPage.xaml.cs">
+	    <DependentUpon>CadastroMedPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\CadastroMedPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 
 </Project>

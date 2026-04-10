@@ -1,7 +1,7 @@
-﻿namespace IngestaoMed.Core.Interfaces
-{
-    public interface INavigationService
+﻿    namespace IngestaoMed.Core.Interfaces
     {
-        Task GoToAsync(string route);
+        public interface INavigationService
+        {
+            Task GoToAsync(string route);
+        }
     }
-}

@@ -22,5 +22,6 @@
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage"
         FlyoutItemIsVisible="False" />
+    
 
 </Shell>

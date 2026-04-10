@@ -36,12 +36,15 @@ namespace IngestaoMed
             // --- SERVIÇOS DE NEGÓCIO ---
 
             builder.Services.AddSingleton<IAuthService, AuthService>();
+            builder.Services.AddSingleton<IMedicamentoService, MedicamentoService>();
 
             // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
 
             // Registre as ViewModels
             builder.Services.AddTransient<CadastroViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<CadastroMedicamentoViewModel>();
+            builder.Services.AddTransient<CadastroMedicamentoPage>();
 
             // Registre as Pages
             builder.Services.AddTransient<CadastroPage>();
