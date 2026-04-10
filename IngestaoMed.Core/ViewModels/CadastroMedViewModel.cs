@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
+using IngestaoMed.Core.Services;
+using IngestaoMed.Core.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace IngestaoMed.Core.ViewModels
 {

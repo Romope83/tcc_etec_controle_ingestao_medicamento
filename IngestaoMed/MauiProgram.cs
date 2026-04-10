@@ -28,7 +28,7 @@ namespace IngestaoMed
 
             // Define o caminho do arquivo .db3
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "IngestaoMed.db3");
-
+            System.Diagnostics.Debug.Write(dbPath);
             // Registra o Banco
             builder.Services.AddSingleton<IDatabaseContext>(s =>
                 ActivatorUtilities.CreateInstance<DatabaseContext>(s, dbPath));
