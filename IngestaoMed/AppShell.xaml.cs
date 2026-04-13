@@ -5,6 +5,15 @@
         public AppShell()
         {
             InitializeComponent();
+
+            // Registramos as rotas das páginas que não estão fixas no ShellContent do XAML
+            // ou que queremos garantir o acesso via INavigationService.
+
+            Routing.RegisterRoute(nameof(Views.CadastroMedicamentoPage), typeof(Views.CadastroMedicamentoPage));
+            Routing.RegisterRoute(nameof(Views.ListaMedicamentosPage), typeof(Views.ListaMedicamentosPage));
+
+            // Dica: Se CadastroPage e LoginPage já estão no XAML com Route="...", 
+            // o Shell já as reconhece, mas registrar aqui com nameof evita erros de digitação.
         }
     }
 }

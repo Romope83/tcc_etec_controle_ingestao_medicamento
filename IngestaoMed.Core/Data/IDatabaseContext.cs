@@ -11,5 +11,7 @@ namespace IngestaoMed.Core.Data
         Task<T?> BuscarPrimeiroAsync<T>() where T : new();
 
         Task<int> ContarAsync<T>() where T : new();
+
+        Task<List<T>> BuscarTodosAsync<T>() where T : new();
     }
 }

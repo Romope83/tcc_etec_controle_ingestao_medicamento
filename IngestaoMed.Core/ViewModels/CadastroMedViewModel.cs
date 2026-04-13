@@ -56,6 +56,12 @@ namespace IngestaoMed.Core.ViewModels
                 FormaIngestao = FormaIngestao
                 // FotoPath pode ser adicionado futuramente através de um MediaPicker
             };
+            bool jaExiste = await _medicamentoService.ExisteMedicamentoAsync(NomeComercial, FormaIngestao);
+            if (jaExiste)
+            {
+                await _dialogService.DisplayAlert("Erro", "Este medicamento já está cadastrado com esta forma de ingestão.", "OK");
+                return;
+            }
 
             // 3. Persistência via Serviço Abstraído
             bool sucesso = await _medicamentoService.AdicionarMedicamentoAsync(novoMedicamento);
