@@ -22,14 +22,33 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Medicamento">
                     <Frame Margin="0,0,0,10" Padding="15" CornerRadius="8" HasShadow="True">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding NomeComercial}" FontSize="18" FontAttributes="Bold" />
-                            <HorizontalStackLayout Spacing="10">
-                                <Label Text="{Binding Dosagem}" TextColor="Red" />
-                                <Label Text="|" TextColor="LightGray" />
-                                <Label Text="{Binding FormaIngestao}" TextColor="Black" />
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*, Auto">
+
+                            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                <Label Text="{Binding NomeComercial}" FontSize="18" FontAttributes="Bold" TextColor="Black" />
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="{Binding Dosagem}" TextColor="Gray" />
+                                    <Label Text="|" TextColor="LightGray" />
+                                    <Label Text="{Binding FormaIngestao}" TextColor="Gray" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1" 
+                                    Text="🗑️" 
+                                    BackgroundColor="Transparent" 
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaMedicamentosViewModel}}, Path=RemoverMedicamentoCommand}"
+                                    CommandParameter="{Binding .}" />
+                            
+                            
+<!-->                       <ImageButton Grid.Column="1"
+                                Source 
+                                 WidthRequest="24"
+                                 HeightRequest="24"
+                                 VerticalOptions="Center"
+                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaMedicamentosViewModel}}, Path=RemoverMedicamentoCommand}"
+                                 CommandParameter="{Binding .}" /> !-->
+                        </Grid>
+
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

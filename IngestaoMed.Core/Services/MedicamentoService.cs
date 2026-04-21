@@ -31,5 +31,11 @@ namespace IngestaoMed.Core.Services
         {
             return await _db.BuscarTodosAsync<Medicamento>();
         }
+        public async Task<bool> RemoverMedicamentoAsync(Medicamento medicamento)
+        {
+            var resultado = await _db.ExcluirAsync(medicamento);
+            return resultado > 0; // Se deletou 1 ou mais linhas, retorna true
+        }
+
     }
 }

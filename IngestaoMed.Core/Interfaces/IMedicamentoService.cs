@@ -9,6 +9,6 @@ namespace IngestaoMed.Core.Interfaces
         Task<bool> ExisteMedicamentoAsync(string nome, string forma);
         Task<List<Medicamento>> ObterTodosAsync();
 
-
+        Task<bool> RemoverMedicamentoAsync(Medicamento medicamento);
     }
 }
