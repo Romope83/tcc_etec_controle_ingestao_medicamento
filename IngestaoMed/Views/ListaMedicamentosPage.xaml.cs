@@ -22,7 +22,9 @@ namespace IngestaoMed.Views
         {
             base.OnAppearing();
 
-            // Executa o comando de carregamento da ViewModel de forma assíncrona
+            // Damos um pequeno respiro para o sistema de UI
+            await Task.Delay(100);
+
             if (_viewModel.CarregarMedicamentosCommand.CanExecute(null))
             {
                 await _viewModel.CarregarMedicamentosCommand.ExecuteAsync(null);

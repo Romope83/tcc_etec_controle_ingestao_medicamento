@@ -34,7 +34,7 @@ namespace IngestaoMed.Core.ViewModels
         [RelayCommand]
         private async Task NavegarParaCadastroAsync()
         {
-            await _navigationService.GoToAsync("CadastroMedPage");
+            await _navigationService.GoToAsync("CadastroMedicamentoPage");
         }
     }
 }

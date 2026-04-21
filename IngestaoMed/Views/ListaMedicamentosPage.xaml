@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
              x:Class="IngestaoMed.Views.ListaMedicamentosPage"
              x:DataType="vm:ListaMedicamentosViewModel"
+             xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
              Title="Meus Medicamentos">
 
     <ContentPage.Behaviors>
@@ -15,18 +16,18 @@
 
         <Label Text="Nenhum medicamento cadastrado." 
                IsVisible="{Binding Medicamentos.Count, Converter={StaticResource IntToBoolConverter}}"
-               HorizontalOptions="Center" VerticalOptions="Center" TextColor="Gray"/>
+               HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
 
         <CollectionView Grid.Row="0" ItemsSource="{Binding Medicamentos}">
             <CollectionView.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:Medicamento">
                     <Frame Margin="0,0,0,10" Padding="15" CornerRadius="8" HasShadow="True">
                         <VerticalStackLayout>
                             <Label Text="{Binding NomeComercial}" FontSize="18" FontAttributes="Bold" />
                             <HorizontalStackLayout Spacing="10">
-                                <Label Text="{Binding Dosagem}" TextColor="Gray" />
+                                <Label Text="{Binding Dosagem}" TextColor="Red" />
                                 <Label Text="|" TextColor="LightGray" />
-                                <Label Text="{Binding FormaIngestao}" TextColor="Gray" />
+                                <Label Text="{Binding FormaIngestao}" TextColor="Black" />
                             </HorizontalStackLayout>
                         </VerticalStackLayout>
                     </Frame>
