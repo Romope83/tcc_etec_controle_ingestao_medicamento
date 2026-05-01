@@ -52,5 +52,21 @@ namespace IngestaoMed.Core.Data
             await Init();
             return await _connection!.Table<T>().CountAsync();
         }
+        public async Task<List<T>> BuscarTodosAsync<T>() where T : new()
+        {
+            await Init();
+            return await _connection!.Table<T>().ToListAsync();
+        }
+
+        public async Task<int> ExcluirAsync<T>(T item) where T : new()
+        {
+            await Init();
+            return await _connection!.DeleteAsync(item);
+        }
+        public async Task<int> AtualizarAsync<T>(T item) where T : new()
+        {
+            await Init();
+            return await _connection!.UpdateAsync(item);
+        }
     }
 }

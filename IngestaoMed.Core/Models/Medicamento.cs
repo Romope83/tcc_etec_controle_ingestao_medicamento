@@ -15,7 +15,7 @@ namespace IngestaoMed.Core.Models
         public int Id { get; set; }
 
         [MaxLength(100), NotNull]
-        public required string NomeComercial { get; set; }
+        public required string? NomeComercial { get; set; }
 
         [MaxLength(50)]
         public string? Dosagem { get; set; }

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.ListaMedicamentosPage"
+             x:DataType="vm:ListaMedicamentosViewModel"
+             xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
+             Title="Meus Medicamentos">
+
+    <ContentPage.Behaviors>
+ 
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="*, Auto" Padding="20">
+
+        <Label Text="Nenhum medicamento cadastrado." 
+               IsVisible="{Binding Medicamentos.Count, Converter={StaticResource IntToBoolConverter}}"
+               HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Medicamentos}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Medicamento">
+                    <Frame Margin="0,0,0,10" Padding="15" CornerRadius="8" HasShadow="True">
+
+                        <Grid ColumnDefinitions="*, Auto">
+
+                            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                <Label Text="{Binding NomeComercial}" FontSize="18" FontAttributes="Bold" TextColor="Black" />
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="{Binding Dosagem}" TextColor="Gray" />
+                                    <Label Text="|" TextColor="LightGray" />
+                                    <Label Text="{Binding FormaIngestao}" TextColor="Gray" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1" 
+                                    Text="🗑️" 
+                                    BackgroundColor="Transparent" 
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaMedicamentosViewModel}}, Path=RemoverMedicamentoCommand}"
+                                    CommandParameter="{Binding .}" />
+                            
+                            
+<!-->                       <ImageButton Grid.Column="1"
+                                Source 
+                                 WidthRequest="24"
+                                 HeightRequest="24"
+                                 VerticalOptions="Center"
+                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaMedicamentosViewModel}}, Path=RemoverMedicamentoCommand}"
+                                 CommandParameter="{Binding .}" /> !-->
+                        </Grid>
+
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="1" 
+                Text="+ Novo Medicamento" 
+                Command="{Binding NavegarParaCadastroCommand}"
+                BackgroundColor="{StaticResource Primary}" 
+                CornerRadius="25" 
+                Margin="0,10,0,0"/>
+    </Grid>
+</ContentPage>

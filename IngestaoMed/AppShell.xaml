@@ -22,5 +22,20 @@
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage"
         FlyoutItemIsVisible="False" />
+    <ShellContent
+    Title="CadastroMed"
+    ContentTemplate="{DataTemplate views:CadastroMedicamentoPage}"
+    Route="CadastroMedPage" />
+    <ShellContent
+        Title="Lista de medicamentos"
+        ContentTemplate="{DataTemplate views:ListaMedicamentosPage}"
+        Route="ListaMedicamentoPage"
+        />
+
+    <ShellContent
+    Title="Lista de Paciente"
+    ContentTemplate="{DataTemplate views:ListaPacientesPage}"
+    Route="ListaPacientePage"
+    />
 
 </Shell>

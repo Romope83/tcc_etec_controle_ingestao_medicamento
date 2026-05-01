@@ -1,10 +1,13 @@
-﻿using IngestaoMed.Core.Data; // Namespace da pasta Data
+﻿using IngestaoMed;
+using IngestaoMed.Core.Data; // Namespace da pasta Data
 using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Services;
 using IngestaoMed.Core.ViewModels;
 using IngestaoMed.Services;
 using IngestaoMed.Views;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using CommunityToolkit.Maui;
 
 namespace IngestaoMed
 {
@@ -15,6 +18,7 @@ namespace IngestaoMed
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -28,7 +32,7 @@ namespace IngestaoMed
 
             // Define o caminho do arquivo .db3
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "IngestaoMed.db3");
-
+            System.Diagnostics.Debug.Write(dbPath);
             // Registra o Banco
             builder.Services.AddSingleton<IDatabaseContext>(s =>
                 ActivatorUtilities.CreateInstance<DatabaseContext>(s, dbPath));
@@ -36,16 +40,24 @@ namespace IngestaoMed
             // --- SERVIÇOS DE NEGÓCIO ---
 
             builder.Services.AddSingleton<IAuthService, AuthService>();
-
+            builder.Services.AddSingleton<IMedicamentoService, MedicamentoService>();
+            builder.Services.AddSingleton<IPacienteService, PacienteService>();
             // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
 
             // Registre as ViewModels
             builder.Services.AddTransient<CadastroViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
-
+            builder.Services.AddTransient<CadastroMedicamentoViewModel>();
+            builder.Services.AddTransient<ListaMedicamentosViewModel>();
+            builder.Services.AddTransient<ListaPacientesViewModel>();
+            builder.Services.AddTransient<CadastroPacienteViewModel>();
             // Registre as Pages
             builder.Services.AddTransient<CadastroPage>();
-
+            builder.Services.AddTransient<CadastroMedicamentoPage>();
+            builder.Services.AddTransient<ListaMedicamentosPage>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<ListaPacientesPage>();
+            builder.Services.AddTransient<CadastroPacientePage>();
             // STARTUP
             builder.Services.AddSingleton<AppShell>();
             builder.Services.AddSingleton<App>();

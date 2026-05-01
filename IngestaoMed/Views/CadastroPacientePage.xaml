@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.CadastroPacientePage"
+             Title="Novo Paciente"
+             x:DataType="vm:CadastroPacienteViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30">
+
+            <Label Text="Cadastrar Paciente" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" />
+
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Nome do Paciente *" FontSize="14" TextColor="Gray" />
+                <Entry Text="{Binding Nome}" 
+                       ClearButtonVisibility="WhileEditing" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Telefone" FontSize="14" TextColor="Gray" />
+                <Entry Text="{Binding Telefone}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Email" FontSize="14" TextColor="Gray" />
+                <Entry Text="{Binding Email}"/>
+            </VerticalStackLayout>
+
+            <Button Text="Salvar Paciente" 
+                    Command="{Binding SalvarCommand}" 
+                    Margin="0, 20, 0, 0"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

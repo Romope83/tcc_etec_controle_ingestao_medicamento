@@ -8,5 +8,13 @@ namespace IngestaoMed.Services
         {
             return Shell.Current.GoToAsync(route);
         }
+
+        public async Task GoBackAsync()
+        {
+            await Shell.Current.GoToAsync("..");
+        }
     }
+
+
+
 }

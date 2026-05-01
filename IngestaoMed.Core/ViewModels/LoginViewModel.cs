@@ -37,7 +37,7 @@ namespace IngestaoMed.Core.ViewModels
 
             if (sucesso)
             {
-                await _navigationService.GoToAsync("//MainPage");
+                await _navigationService.GoToAsync("//CadastroMedPage");
             }
             else
             {
