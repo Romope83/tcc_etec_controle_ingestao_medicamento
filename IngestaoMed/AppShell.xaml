@@ -32,4 +32,10 @@
         Route="ListaMedicamentoPage"
         />
 
+    <ShellContent
+    Title="Lista de Paciente"
+    ContentTemplate="{DataTemplate views:ListaPacientesPage}"
+    Route="ListaPacientePage"
+    />
+
 </Shell>

@@ -41,7 +41,7 @@ namespace IngestaoMed
 
             builder.Services.AddSingleton<IAuthService, AuthService>();
             builder.Services.AddSingleton<IMedicamentoService, MedicamentoService>();
-
+            builder.Services.AddSingleton<IPacienteService, PacienteService>();
             // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
 
             // Registre as ViewModels
@@ -49,11 +49,15 @@ namespace IngestaoMed
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<CadastroMedicamentoViewModel>();
             builder.Services.AddTransient<ListaMedicamentosViewModel>();
+            builder.Services.AddTransient<ListaPacientesViewModel>();
+            builder.Services.AddTransient<CadastroPacienteViewModel>();
             // Registre as Pages
             builder.Services.AddTransient<CadastroPage>();
             builder.Services.AddTransient<CadastroMedicamentoPage>();
             builder.Services.AddTransient<ListaMedicamentosPage>();
             builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<ListaPacientesPage>();
+            builder.Services.AddTransient<CadastroPacientePage>();
             // STARTUP
             builder.Services.AddSingleton<AppShell>();
             builder.Services.AddSingleton<App>();

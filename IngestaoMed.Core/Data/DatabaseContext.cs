@@ -63,5 +63,10 @@ namespace IngestaoMed.Core.Data
             await Init();
             return await _connection!.DeleteAsync(item);
         }
+        public async Task<int> AtualizarAsync<T>(T item) where T : new()
+        {
+            await Init();
+            return await _connection!.UpdateAsync(item);
+        }
     }
 }

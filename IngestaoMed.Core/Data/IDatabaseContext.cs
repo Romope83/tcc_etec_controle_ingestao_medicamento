@@ -15,5 +15,7 @@ namespace IngestaoMed.Core.Data
         Task<int> ExcluirAsync<T>(T item) where T : new();
 
         Task<List<T>> BuscarTodosAsync<T>() where T : new();
+        Task<int> AtualizarAsync<T>(T item) where T : new();
+
     }
 }
