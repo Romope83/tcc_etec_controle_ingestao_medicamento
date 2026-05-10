@@ -1,0 +1,65 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="IngestaoMed.Views.Onboarding.WelcomePage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="White">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="Auto, *, Auto, Auto" Padding="20">
+
+        <Button Grid.Row="0"
+        Text="Pular"
+        Command="{Binding FinalizarApresentacaoCommand}"
+        IsVisible="{Binding MostrarBotaoPular}"
+        HorizontalOptions="End"
+        BackgroundColor="Transparent" />
+
+        <CarouselView Grid.Row="1"
+                  ItemsSource="{Binding Slides}"
+                  IndicatorView="IndicadorPagina"
+                  Position="{Binding PosicaoAtual}"
+                  Loop="False">
+            <CarouselView.ItemTemplate>
+                <DataTemplate>
+                    <Grid RowDefinitions="*, Auto, Auto" RowSpacing="15" Padding="10">
+
+                        <Image Grid.Row="0"
+                           Source="{Binding Imagem}"
+                           Aspect="AspectFit"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center" />
+
+                        <Label Grid.Row="1"
+                           Text="{Binding Titulo}"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+
+                        <Label Grid.Row="2"
+                           Text="{Binding Descricao}"
+                           FontSize="16"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+                    </Grid>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+
+        <IndicatorView x:Name="IndicadorPagina"
+                   Grid.Row="2"
+                   HorizontalOptions="Center"
+                   Margin="0,15" />
+
+        <Button Grid.Row="3"
+        Text="{Binding TextoBotaoPrincipal}"
+        Command="{Binding AvancarOuFinalizarCommand}"
+        HeightRequest="50" />
+
+    </Grid>
+</ContentPage>

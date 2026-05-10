@@ -5,7 +5,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:IngestaoMed"
     xmlns:views="clr-namespace:IngestaoMed.Views" 
+    xmlns:onboarding="clr-namespace:IngestaoMed.Views.Onboarding"
     Title="IngestaoMed">
+
+    <ShellContent
+        Title="Boas-vindas"
+        ContentTemplate="{DataTemplate onboarding:WelcomePage}"
+        Route="WelcomePage"
+        FlyoutItemIsVisible="False" />
 
     <ShellContent
         Title="Cadastro"
@@ -22,20 +29,20 @@
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage"
         FlyoutItemIsVisible="False" />
+
     <ShellContent
-    Title="CadastroMed"
-    ContentTemplate="{DataTemplate views:CadastroMedicamentoPage}"
-    Route="CadastroMedPage" />
+        Title="CadastroMed"
+        ContentTemplate="{DataTemplate views:CadastroMedicamentoPage}"
+        Route="CadastroMedPage" />
+
     <ShellContent
         Title="Lista de medicamentos"
         ContentTemplate="{DataTemplate views:ListaMedicamentosPage}"
-        Route="ListaMedicamentoPage"
-        />
+        Route="ListaMedicamentoPage" />
 
     <ShellContent
-    Title="Lista de Paciente"
-    ContentTemplate="{DataTemplate views:ListaPacientesPage}"
-    Route="ListaPacientePage"
-    />
+        Title="Lista de Paciente"
+        ContentTemplate="{DataTemplate views:ListaPacientesPage}"
+        Route="ListaPacientePage" />
 
 </Shell>

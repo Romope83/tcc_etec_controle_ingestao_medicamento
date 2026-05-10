@@ -1,4 +1,5 @@
 ﻿using IngestaoMed;
+using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Services;
 
 namespace IngestaoMed;
@@ -7,12 +8,14 @@ public partial class App : Application
 {
     private readonly IAuthService _authService;
     private readonly AppShell _shell;
+    private readonly IConfigService _configService;
 
-    public App(IAuthService authService, AppShell shell)
+    public App(IAuthService authService, AppShell shell, IConfigService configService)
     {
         InitializeComponent();
         _authService = authService;
         _shell = shell;
+        _configService = configService;
     }
 
 
@@ -24,18 +27,26 @@ public partial class App : Application
 
     private async Task WindowsInicialization()
     {
-        // Verifica se já existe algum cuidador no SQLite
-        bool existeUsuario = await _authService.ExisteCuidadorCadastrado();
-
-        if (existeUsuario)
+        _configService.EhPrimeiroAcesso = true;
+        if (_configService.EhPrimeiroAcesso)
         {
-            // Se existe, mandamos para o Login (ou Home, se preferir sem senha)
-            await Shell.Current.GoToAsync("//LoginPage");
+            // Estado 1: Usuário instalou agora. Mostra Slides.
+            await Shell.Current.GoToAsync("//WelcomePage");
         }
         else
         {
-            // Se não existe, mantém no Cadastro
-            await Shell.Current.GoToAsync("//CadastroPage");
+            bool existeUsuario = await _authService.ExisteCuidadorCadastrado();
+
+            if (existeUsuario)
+            {
+                // Estado 3: Usuário recorrente.
+                await Shell.Current.GoToAsync("//LoginPage");
+            }
+            else
+            {
+                // Estado 2: Já viu os slides, mas não terminou o cadastro.
+                await Shell.Current.GoToAsync("//RegisterCuidadorPage");
+            }
         }
     }
 
