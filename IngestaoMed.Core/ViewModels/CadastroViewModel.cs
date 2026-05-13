@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
 using IngestaoMed.Core.Services;
-using IngestaoMed.Core.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace IngestaoMed.Core.ViewModels
@@ -11,6 +11,8 @@ namespace IngestaoMed.Core.ViewModels
     {
         private readonly IAuthService _authService;
         private readonly IDialogService _dialogService;
+        private readonly IConfigService _configService;
+        private readonly INavigationService _navigationService;
 
         [ObservableProperty]
         private string _nome = string.Empty;
@@ -24,61 +26,83 @@ namespace IngestaoMed.Core.ViewModels
         [ObservableProperty]
         private string? _telefone;
 
-
-        public CadastroViewModel(IAuthService authService, IDialogService dialogService)
+        public CadastroViewModel(
+            IAuthService authService,
+            IDialogService dialogService,
+            IConfigService configService,
+            INavigationService navigationService)
         {
             _authService = authService;
             _dialogService = dialogService;
+            _configService = configService;
+            _navigationService = navigationService;
         }
 
         [RelayCommand]
         private async Task SalvarCadastro()
         {
-            // 1. Validação de Campos Vazios
-            if (string.IsNullOrWhiteSpace(Nome) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Senha))
-            {
-                await _dialogService.DisplayAlert("Erro", "Preencha todos os campos obrigatórios.", "OK");
-                return;
-            }
+            // Validações locais e de banco
+            if (!await ValidarCamposAsync()) return;
 
-            // 2. Validação de Formato de E-mail (Regex)
-            if (!ValidarFormatoEmail(Email))
+            var novoCuidador = new Cuidador
             {
-                await _dialogService.DisplayAlert("E-mail Inválido", "Por favor, insira um e-mail com formato correto (ex@email.com).", "OK");
-                return;
-            }
+                Nome = Nome,
+                Email = Email,
+                Telefone = Telefone,
+                PasswordHash = string.Empty // O Hash é processado internamente pelo IAuthService
+            };
 
-            // 3. Critérios Mínimos de Senha (6 caracteres)
-            if (Senha.Length < 6)
-            {
-                await _dialogService.DisplayAlert("Senha Fraca", "A senha deve ter pelo menos 6 caracteres.", "OK");
-                return;
-            }
-
-            // 4. Verificação de E-mail Duplicado (Regra de Negócio no Banco)
-            bool emailJaExiste = await _authService.ValidarEmail(Email);
-            if (emailJaExiste)
-            {
-                await _dialogService.DisplayAlert("Erro", "Este e-mail já está cadastrado no sistema.", "OK");
-                return;
-            }
-
-            // Se passou por tudo, aí sim salvamos
-            var novoCuidador = new Cuidador { Nome = Nome, Email = Email, Telefone = Telefone, PasswordHash = string.Empty };
             bool sucesso = await _authService.RegistrarCuidador(novoCuidador, Senha);
 
             if (sucesso)
             {
-                await _dialogService.DisplayAlert("Sucesso", "Cuidador cadastrado com sucesso!", "OK");
-                // Futuro: Navegar para Login ou Home
+                // Atualiza o estado global de configuração no IConfigService
+                _configService.EhPrimeiroAcesso = false;
+                _configService.EmailCuidadorConfigurado = Email;
+
+                await _dialogService.DisplayAlert("Sucesso", "Perfil configurado com sucesso!", "OK");
+
+                // Navegação via interface desacoplada
+                await _navigationService.GoToAsync("//ListaPacientePage");
+            }
+            else
+            {
+                await _dialogService.DisplayAlert("Erro", "Não foi possível realizar o cadastro. Tente novamente mais tarde.", "OK");
             }
         }
 
-        // Método auxiliar para Regex de e-mail
-        private bool ValidarFormatoEmail(string email)
+        private async Task<bool> ValidarCamposAsync()
         {
-            var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-            return emailRegex.IsMatch(email);
+            // 1. Validação de preenchimento
+            if (string.IsNullOrWhiteSpace(Nome) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Senha))
+            {
+                await _dialogService.DisplayAlert("Campos Obrigatórios", "Por favor, preencha nome, e-mail e senha.", "OK");
+                return false;
+            }
+
+            // 2. Validação de formato de e-mail
+            if (!Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                await _dialogService.DisplayAlert("E-mail Inválido", "Por favor, insira um endereço de e-mail válido.", "OK");
+                return false;
+            }
+
+            // 3. Validação de segurança da senha
+            if (Senha.Length < 6)
+            {
+                await _dialogService.DisplayAlert("Senha Curta", "A senha deve conter no mínimo 6 caracteres para sua segurança.", "OK");
+                return false;
+            }
+
+            // 4. Verificação de e-mail duplicado no banco de dados
+            bool emailJaExiste = await _authService.ValidarEmail(Email);
+            if (emailJaExiste)
+            {
+                await _dialogService.DisplayAlert("E-mail em uso", "Este e-mail já está cadastrado. Tente recuperar sua senha ou use outro e-mail.", "OK");
+                return false;
+            }
+
+            return true;
         }
     }
 }

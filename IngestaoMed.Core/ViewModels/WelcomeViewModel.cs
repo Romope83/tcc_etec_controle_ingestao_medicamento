@@ -46,9 +46,14 @@ namespace IngestaoMed.Core.ViewModels
             {
                 Titulo = "Segurança",
                 Descricao = "Notificamos seu cuidador caso você esqueça a dose.",
-                Imagem = "security_img.png"
+                Imagem = "seguranca_onboarding.png"
             });
-            // Adicione os outros slides aqui...
+            Slides.Add(new OnboardingItem
+            {
+                Titulo = "Notificação ao Cuidador",
+                Descricao = "Se uma dose for esquecida, o cuidador é avisado automaticamente por e-mail",
+                Imagem = "seguranca_onboarding.png"
+            });
         }
 
         // Este método roda automaticamente sempre que a PosicaoAtual mudar (via CarouselView)
@@ -76,7 +81,7 @@ namespace IngestaoMed.Core.ViewModels
         private async Task FinalizarApresentacao()
         {
             _configuracao.EhPrimeiroAcesso = false;
-            await _navegacao.GoToAsync("//RegisterCuidadorPage");
+            await _navegacao.GoToAsync("//CadastroPage");
         }
     }
 }

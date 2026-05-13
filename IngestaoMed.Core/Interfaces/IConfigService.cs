@@ -4,6 +4,6 @@
     {
         bool EhPrimeiroAcesso { get; set; }
         string? EmailCuidadorConfigurado { get; set; }
-        // Outras flags que surgirem, como "ModoEscuro" ou "NotificacoesAtivas"
+        Models.ConfiguracaoCuidador? ConfiguracaoCuidador { get; set; }
     }
 }

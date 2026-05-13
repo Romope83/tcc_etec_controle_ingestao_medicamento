@@ -69,6 +69,7 @@ namespace IngestaoMed
             builder.Services.AddTransient<CadastroPacienteViewModel>();
             builder.Services.AddTransient<AlarmeViewModel>();
             builder.Services.AddTransient<WelcomeViewModel>();
+            //builder.Services.AddTransient<RegisterCuidadorViewModel>();
             // Registre as Pages
             builder.Services.AddTransient<CadastroPage>();
             builder.Services.AddTransient<CadastroMedicamentoPage>();
@@ -77,6 +78,7 @@ namespace IngestaoMed
             builder.Services.AddTransient<ListaPacientesPage>();
             builder.Services.AddTransient<CadastroPacientePage>();
             builder.Services.AddTransient<WelcomePage>();
+            builder.Services.AddTransient<RegisterCuidadorPage>();
             // STARTUP
             builder.Services.AddSingleton<AppShell>();
             builder.Services.AddSingleton<App>();

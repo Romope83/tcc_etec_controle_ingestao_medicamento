@@ -27,7 +27,7 @@ public partial class App : Application
 
     private async Task WindowsInicialization()
     {
-        _configService.EhPrimeiroAcesso = true;
+        //_configService.EhPrimeiroAcesso = true;
         if (_configService.EhPrimeiroAcesso)
         {
             // Estado 1: Usuário instalou agora. Mostra Slides.

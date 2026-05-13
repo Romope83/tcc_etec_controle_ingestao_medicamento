@@ -12,12 +12,23 @@ namespace IngestaoMed.Tests.ViewModels
         private readonly Mock<IAuthService> _authMock;
         private readonly Mock<IDialogService> _dialogMock;
         private readonly CadastroViewModel _viewModel;
+        private readonly Mock<IConfigService> _configMock;
+        private readonly Mock<INavigationService> _navigationMock;
 
         public CadastroViewModelTests()
         {
+            // Instanciação dos Mocks para as novas dependências
             _authMock = new Mock<IAuthService>();
             _dialogMock = new Mock<IDialogService>();
-            _viewModel = new CadastroViewModel(_authMock.Object, _dialogMock.Object);
+            _configMock = new Mock<IConfigService>();
+            _navigationMock = new Mock<INavigationService>();
+
+            // Injeção de todos os mocks no construtor da ViewModel
+            _viewModel = new CadastroViewModel(
+                _authMock.Object,
+                _dialogMock.Object,
+                _configMock.Object,
+                _navigationMock.Object);
         }
 
         [Fact]
@@ -26,12 +37,16 @@ namespace IngestaoMed.Tests.ViewModels
             // Arrange
             _viewModel.Nome = "";
             _viewModel.Email = "";
+            _viewModel.Senha = ""; // Lembre-se que a senha também é obrigatória agora
 
             // Act
             await _viewModel.SalvarCadastroCommand.ExecuteAsync(null);
 
-            // Assert
-            _dialogMock.Verify(d => d.DisplayAlert("Erro", It.IsAny<string>(), "OK"), Times.Once);
+            // Assert - O título deve bater exatamente com o da ViewModel
+            _dialogMock.Verify(d => d.DisplayAlert(
+                "Campos Obrigatórios",
+                "Por favor, preencha nome, e-mail e senha.",
+                "OK"), Times.Once);
         }
 
         [Theory]

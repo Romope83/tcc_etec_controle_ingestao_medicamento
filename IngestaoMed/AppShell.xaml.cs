@@ -17,8 +17,7 @@ namespace IngestaoMed
 
             // --- ADICIONE OS NOVOS REGISTROS ---
             Routing.RegisterRoute("WelcomePage", typeof(WelcomePage));
-            // Se você criou a RegisterCuidadorPage, registre-a também:
-            // Routing.RegisterRoute("RegisterCuidadorPage", typeof(Views.Auth.RegisterCuidadorPage));
+            Routing.RegisterRoute("RegisterCuidadorPage", typeof(Views.Onboarding.RegisterCuidadorPage));
         }
     }
 }
