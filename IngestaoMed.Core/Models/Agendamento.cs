@@ -13,6 +13,9 @@ namespace IngestaoMed.Core.Models
         [Indexed, NotNull]
         public int TratamentoId { get; set; }
 
+        [Indexed, NotNull]
+        public int MedicamentoTratamentoId { get; set; }
+
         [NotNull]
         public DateTime HorarioProgramado { get; set; }
 
@@ -23,5 +26,8 @@ namespace IngestaoMed.Core.Models
 
         [Ignore]
         public Tratamento? Tratamento { get; set; }
+
+        [Ignore]
+        public string? NomeRemedioEspecifico { get; set; }
     }
 }

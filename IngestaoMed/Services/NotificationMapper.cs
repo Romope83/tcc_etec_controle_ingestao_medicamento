@@ -1,7 +1,8 @@
 ﻿using IngestaoMed.Core.Models;
-using IngestaoMed.Interfaces; // Referência para a nova pasta
+using IngestaoMed.Core.Interfaces; // Ajustado para seu namespace de interfaces
 using Plugin.LocalNotification;
 using Plugin.LocalNotification.AndroidOption;
+using IngestaoMed.Interfaces;
 
 namespace IngestaoMed.Services.Notifications
 {
@@ -11,17 +12,25 @@ namespace IngestaoMed.Services.Notifications
         {
             if (agendamento == null) return null;
 
+            string nomeMedicamento = !string.IsNullOrWhiteSpace(agendamento.NomeRemedioEspecifico)
+                ? agendamento.NomeRemedioEspecifico
+                : "Medicamento";
+
             return new NotificationRequest
             {
                 NotificationId = agendamento.Id,
                 Title = "💊 Hora do seu Medicamento",
-                Description = $"Está na hora de tomar: {agendamento.Tratamento?.NomeMedicamento}",
+                // Agora exibe o remédio exato vinculado a este horário
+                Description = $"Está na hora de tomar: {nomeMedicamento}",
                 ReturningData = agendamento.Id.ToString(),
                 CategoryType = NotificationCategoryType.Status,
                 Schedule = new NotificationRequestSchedule
                 {
                     NotifyTime = agendamento.HorarioProgramado,
-                    Android = new AndroidScheduleOptions { AlarmType = AndroidAlarmType.RtcWakeup}
+                    Android = new AndroidScheduleOptions
+                    {
+                        AlarmType = AndroidAlarmType.RtcWakeup
+                    }
                 }
             };
         }

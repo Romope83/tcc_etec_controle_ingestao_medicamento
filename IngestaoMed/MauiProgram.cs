@@ -10,8 +10,14 @@ using IngestaoMed.Services.Notifications;
 using IngestaoMed.Views;
 using IngestaoMed.Views.Onboarding;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.LifecycleEvents;
 using Plugin.LocalNotification;
-
+#if WINDOWS
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
+using Windows.Graphics;
+using WinRT.Interop; // Necessário para o WindowNative
+#endif
 namespace IngestaoMed
 {
     public static class MauiProgram
@@ -27,6 +33,23 @@ namespace IngestaoMed
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                })
+                .ConfigureLifecycleEvents(events =>
+                {
+#if WINDOWS
+                events.AddWindows(windows => windows
+                    .OnWindowCreated(window =>
+                    {
+                        window.ExtendsContentIntoTitleBar = false;
+                        var handle = WinRT.Interop.WindowNative.GetWindowHandle(window);
+                        var id = Win32Interop.GetWindowIdFromWindow(handle);
+                        var appWindow = AppWindow.GetFromWindowId(id);
+
+                        // Define as dimensões (Largura, Altura)
+                        appWindow.Resize(new SizeInt32(450, 800));
+                    }));
+#endif
+
                 });
 
             // --- SERVIÇOS DE INFRAESTRUTURA E INTERFACE ---
@@ -69,6 +92,8 @@ namespace IngestaoMed
             builder.Services.AddTransient<CadastroPacienteViewModel>();
             builder.Services.AddTransient<AlarmeViewModel>();
             builder.Services.AddTransient<WelcomeViewModel>();
+            builder.Services.AddTransient<TratamentoViewModel>();
+            builder.Services.AddTransient<PacienteDetalhesViewModel>();
             //builder.Services.AddTransient<RegisterCuidadorViewModel>();
             // Registre as Pages
             builder.Services.AddTransient<CadastroPage>();
@@ -79,6 +104,7 @@ namespace IngestaoMed
             builder.Services.AddTransient<CadastroPacientePage>();
             builder.Services.AddTransient<WelcomePage>();
             builder.Services.AddTransient<RegisterCuidadorPage>();
+            builder.Services.AddTransient<PacienteDetalhesPage>();
             // STARTUP
             builder.Services.AddSingleton<AppShell>();
             builder.Services.AddSingleton<App>();

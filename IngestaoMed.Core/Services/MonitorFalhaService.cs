@@ -15,40 +15,41 @@ namespace IngestaoMed.Core.Services
 
         public async Task VerificarELoggerFalhaAsync(int agendamentoId, int totalSonecas)
         {
-            // 1. Busca configuração do cuidador
             var config = await _db.BuscarPrimeiroAsync<ConfiguracaoCuidador>();
             if (config == null || !config.AlertaAtivado) return;
 
-            // 2. Verifica se atingiu o limite crítico de sonecas
             if (totalSonecas >= config.LimiteSonecasParaAlerta)
             {
-                // 3. Busca o agendamento
+                // 1. Busca o agendamento específico
                 var agendamento = await _db.BuscarPrimeiroAsync<Agendamento>(a => a.Id == agendamentoId);
                 if (agendamento == null) return;
 
-                // 4. Busca o tratamento para identificar o que falhou
-                var tratamento = await _db.BuscarPrimeiroAsync<Tratamento>(t => t.Id == agendamento.TratamentoId);
+                // 2. Busca o vínculo do medicamento dentro do tratamento
+                var vinculo = await _db.BuscarPrimeiroAsync<MedicamentoTratamento>(m => m.Id == agendamento.MedicamentoTratamentoId);
+                if (vinculo == null) return;
 
-                // Prioriza o Nome do Tratamento, se vazio usa a propriedade de apoio ou genérico
-                string identificadorMed = !string.IsNullOrEmpty(tratamento?.Nome)
-                    ? tratamento.Nome
-                    : (tratamento?.NomeMedicamento ?? "Medicamento");
+                // 3. Busca o nome comercial na tabela de Medicamentos
+                var medicamento = await _db.BuscarPrimeiroAsync<Medicamento>(m => m.Id == vinculo.MedicamentoId);
 
-                // 5. Enfileira o e-mail na "Outbox" para envio via internet
+                string nomeRemedio = medicamento?.NomeComercial ?? "Medicamento não identificado";
+
+                // 4. Monta o e-mail focado no remédio específico
                 var emailParaFila = new EmailFila
                 {
                     Destinatario = config.EmailCuidador,
-                    Assunto = "⚠️ ALERTA DE SAÚDE: Falha na Medicação",
+                    Assunto = $"⚠️ ALERTA: Falha no medicamento {nomeRemedio}",
                     Corpo = $@"Olá {config.NomeCuidador},
 
-O sistema IngestaoMed detectou uma falha recorrente.
-O paciente não confirmou a ingestão do medicamento referente ao tratamento: {identificadorMed}.
-O limite de {totalSonecas} sonecas foi atingido e o medicamento ainda consta como pendente.
+O paciente não confirmou a ingestão do seguinte remédio:
+Medicamento: {nomeRemedio}
+Dosagem: {vinculo.Dosagem}
+Instruções: {vinculo.Instrucoes}
 
-Por favor, verifique o estado do paciente.",
+Este remédio faz parte do tratamento: {agendamento.Tratamento?.Nome ?? "N/A"}.
+
+O limite de {totalSonecas} sonecas foi atingido. Por favor, verifique o paciente.",
                     DataCriacao = DateTime.Now,
-                    Enviado = false,
-                    Tentativas = 0
+                    Enviado = false
                 };
 
                 await _db.InserirAsync(emailParaFila);

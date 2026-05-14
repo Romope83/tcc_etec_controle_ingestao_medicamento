@@ -16,6 +16,7 @@ namespace IngestaoMed.Core.Data
 
         Task<List<T>> BuscarTodosAsync<T>() where T : new();
         Task<int> AtualizarAsync<T>(T item) where T : new();
+        Task<List<T>> BuscarOndeAsync<T>(Expression<Func<T, bool>> predicado) where T : new();
 
     }
 }

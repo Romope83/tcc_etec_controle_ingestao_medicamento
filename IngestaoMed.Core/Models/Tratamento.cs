@@ -18,9 +18,6 @@ namespace IngestaoMed.Core.Models
         [Indexed]
         public int PacienteId { get; set; }
 
-        [Indexed]
-        public int MedicamentoId { get; set; }
-
         public string Dosagem { get; set; } = string.Empty;
 
         public int IntervaloHoras { get; set; }
@@ -31,12 +28,14 @@ namespace IngestaoMed.Core.Models
 
         public bool Ativo { get; set; } = true;
 
-        // Propriedades de apoio (Não gravadas no banco)
-        // Úteis para exibir o nome do paciente/remédio na lista sem precisar de JOINS complexos
         [Ignore]
         public string? NomePaciente { get; set; }
 
         [Ignore]
-        public string? NomeMedicamento { get; set; }
+        public List<MedicamentoTratamento> Remedios { get; set; } = new();
+
+        [Ignore]
+        public string PeriodoFormatado => $"{DataInicio:dd/MM/yyyy} até {(DataFim.HasValue ? DataFim.Value.ToString("dd/MM/yyyy") : "Contínuo")}";
     }
+
 }

@@ -26,6 +26,12 @@ namespace IngestaoMed.Core.ViewModels
         [ObservableProperty]
         private string? _telefone;
 
+        [ObservableProperty]
+        private DateTime _dataNascimento = DateTime.Now.AddYears(-30);
+
+        [ObservableProperty]
+        private string? _fotoPerfilPath = "dotnet_bot.png";
+
         public CadastroViewModel(
             IAuthService authService,
             IDialogService dialogService,

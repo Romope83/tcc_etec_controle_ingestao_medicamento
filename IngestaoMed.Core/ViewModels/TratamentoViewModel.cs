@@ -64,75 +64,36 @@ namespace IngestaoMed.Core.ViewModels
         [RelayCommand]
         private async Task Salvar()
         {
-            // 1. Validações de preenchimento
-            if (PacienteSelecionado == null || MedicamentoSelecionado == null || string.IsNullOrWhiteSpace(Nome))
+            // 1. Validação agora foca apenas no "Grupo" de tratamento e no Paciente
+            if (PacienteSelecionado == null || string.IsNullOrWhiteSpace(Nome))
             {
-                await _dialog.DisplayAlert("Erro", "Selecione o paciente, o medicamento e dê um nome ao tratamento.", "OK");
+                await _dialog.DisplayAlert("Erro", "Selecione o paciente e dê um nome ao tratamento.", "OK");
                 return;
             }
 
-            // 2. Validação de intervalo mínimo
-            if (IntervaloHoras <= 0)
-            {
-                await _dialog.DisplayAlert("Erro", "O intervalo entre as doses deve ser maior que zero.", "OK");
-                return;
-            }
-
-            // 3. Validação de consistência de datas
+            // 2. Validação de datas
             if (DataFim.HasValue && DataFim.Value < DataInicio)
             {
                 await _dialog.DisplayAlert("Erro", "A data de término não pode ser anterior ao início.", "OK");
                 return;
             }
 
-            // 4. Projeção de horários para verificação de conflitos
-            var horariosPretendidos = new List<DateTime>();
-            DateTime dataProjetada = DataInicio;
-            DateTime dataLimite = DataFim ?? DateTime.Now.AddDays(30);
-
-            while (dataProjetada <= dataLimite)
-            {
-                horariosPretendidos.Add(dataProjetada);
-                dataProjetada = dataProjetada.AddHours(IntervaloHoras);
-            }
-
-            // 5. Verificação de conflitos com agendamentos existentes
-            var tratamentoTemp = new Tratamento { PacienteId = PacienteSelecionado.Id };
-            var conflitos = await _conflitoService.VerificarConflitosAsync(tratamentoTemp, horariosPretendidos);
-
-            if (conflitos.Any())
-            {
-                bool prosseguir = await _dialog.DisplayAlert("Atenção",
-                    $"Existem {conflitos.Count} agendamentos em horários próximos (janela de 30min). Deseja continuar?", "Sim", "Não");
-
-                if (!prosseguir) return;
-            }
-
-            // 6. Criação do objeto de tratamento
+            // 3. Criação do "Mestre" (Tratamento)
             var novoTratamento = new Tratamento
             {
                 Nome = Nome,
                 Descricao = Descricao,
                 PacienteId = PacienteSelecionado.Id,
-                MedicamentoId = MedicamentoSelecionado.Id,
-                Dosagem = Dosagem,
-                IntervaloHoras = IntervaloHoras,
                 DataInicio = DataInicio,
                 DataFim = DataFim,
                 Ativo = true
             };
 
-            // 7. Persistência e Geração da Agenda
             bool sucesso = await _db.InserirAsync(novoTratamento);
 
             if (sucesso)
             {
-                await GerarAgenda(novoTratamento);
-                await _navigation.GoToAsync("..");
-            }
-            else
-            {
-                await _dialog.DisplayAlert("Erro", "Não foi possível salvar o tratamento.", "OK");
+                await _navigation.GoToAsync($"AdicionarRemediosPage?tratamentoId={novoTratamento.Id}");
             }
         }
 

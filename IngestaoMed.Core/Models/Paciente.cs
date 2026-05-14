@@ -16,6 +16,9 @@ namespace IngestaoMed.Core.Models
         [MaxLength(100), NotNull]
         public required string Nome { get; set; }
 
+        [NotNull]
+        public DateTime DataNascimento { get; set; }
+
         [MaxLength(20)]
         public string? Telefone { get; set; }
 
@@ -24,5 +27,22 @@ namespace IngestaoMed.Core.Models
 
         [MaxLength(255)]
         public string? FotoPerfilPath { get; set; }
+        
+        [Ignore]
+        public List<Tratamento> Tratamentos { get; set; } = new();
+
+        [Ignore]
+        public string IdadeFormatada => $"{DateTime.Today.Year - DataNascimento.Year} anos";
+
+        [Ignore]
+        public string ResumoTratamentos { get; set; } = "00/00";
+
+        [Ignore]
+        public string ProximaData { get; set; } = "--";
+
+        [Ignore]
+        public string ProximoHorario { get; set; } = "--";
+        [Ignore]
+        public bool TemAgendamento { get; set; }
     }
 }

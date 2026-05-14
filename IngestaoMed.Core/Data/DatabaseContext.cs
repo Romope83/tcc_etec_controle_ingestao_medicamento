@@ -27,6 +27,7 @@ namespace IngestaoMed.Core.Data
             await _connection.CreateTableAsync<Tratamento>();
             await _connection.CreateTableAsync<Agendamento>();
             await _connection.CreateTableAsync<Registro>();
+            await _connection.CreateTableAsync<MedicamentoTratamento>();
         }
 
         public async Task<bool> InserirAsync<T>(T entidade) where T : new()
@@ -67,6 +68,11 @@ namespace IngestaoMed.Core.Data
         {
             await Init();
             return await _connection!.UpdateAsync(item);
+        }
+        public async Task<List<T>> BuscarOndeAsync<T>(Expression<Func<T, bool>> predicado) where T : new()
+        {
+            await Init();
+            return await _connection!.Table<T>().Where(predicado).ToListAsync();
         }
     }
 }
