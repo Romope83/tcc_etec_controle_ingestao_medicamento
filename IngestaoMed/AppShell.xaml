@@ -5,37 +5,74 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:IngestaoMed"
     xmlns:views="clr-namespace:IngestaoMed.Views" 
-    Title="IngestaoMed">
+    xmlns:onboarding="clr-namespace:IngestaoMed.Views.Onboarding"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="IngestaoMed"
+    FlyoutBackgroundColor="{DynamicResource Tertiary}">
+
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid ColumnDefinitions="50, *" Padding="15, 10">
+                <Image Grid.Column="0"
+                       Source="{Binding FlyoutIcon}"
+                       HeightRequest="22"
+                       WidthRequest="22">
+                    <Image.Behaviors>
+                        <toolkit:IconTintColorBehavior TintColor="{DynamicResource White}" />
+                    </Image.Behaviors>
+                </Image>
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       TextColor="{DynamicResource White}"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       Margin="10,0,0,0" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+    <ShellContent
+        Title="Boas-vindas"
+        ContentTemplate="{DataTemplate onboarding:WelcomePage}"
+        Route="WelcomePage"
+        FlyoutItemIsVisible="False" />
 
     <ShellContent
         Title="Cadastro"
         ContentTemplate="{DataTemplate views:CadastroPage}"
-        Route="CadastroPage" />
+        Route="CadastroPage" 
+        FlyoutItemIsVisible="False"/>
 
     <ShellContent
         Title="Login"
         ContentTemplate="{DataTemplate views:LoginPage}"
-        Route="LoginPage" />
+        Route="LoginPage" 
+        FlyoutItemIsVisible="False"/>
+
+    <TabBar>
+        <Tab Title="Pacientes" Icon="patient_icon.png">
+            <ShellContent ContentTemplate="{DataTemplate views:ListaPacientesPage}" Route="ListaPacientesPage" />
+        </Tab>
+
+        <Tab Title="Remédios" Icon="pill_icon.png">
+            <ShellContent ContentTemplate="{DataTemplate views:ListaMedicamentosPage}" Route="ListaMedicamentoPage" />
+        </Tab>
+
+        <Tab Title="Tratamentos" Icon="home_icon.png">
+            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" Route="MainPage" />
+        </Tab>
+    </TabBar>
 
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage"
-        FlyoutItemIsVisible="False" />
-    <ShellContent
-    Title="CadastroMed"
-    ContentTemplate="{DataTemplate views:CadastroMedicamentoPage}"
-    Route="CadastroMedPage" />
-    <ShellContent
-        Title="Lista de medicamentos"
-        ContentTemplate="{DataTemplate views:ListaMedicamentosPage}"
-        Route="ListaMedicamentoPage"
-        />
+        Title="Cadastrar Medicamento"
+        ContentTemplate="{DataTemplate views:CadastroMedicamentoPage}"
+        Route="CadastroMedPage" 
+        FlyoutItemIsVisible="False"/>
 
     <ShellContent
-    Title="Lista de Paciente"
-    ContentTemplate="{DataTemplate views:ListaPacientesPage}"
-    Route="ListaPacientePage"
-    />
+        Title="Registro do Cuidador"
+        ContentTemplate="{DataTemplate onboarding:RegisterCuidadorPage}"
+        Route="RegisterCuidadorPage" 
+        FlyoutItemIsVisible="False"/>
 
 </Shell>

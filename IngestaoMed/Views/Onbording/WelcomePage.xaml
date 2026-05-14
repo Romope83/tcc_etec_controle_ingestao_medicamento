@@ -1,0 +1,87 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="IngestaoMed.Views.Onboarding.WelcomePage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Gray100}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="60, *, Auto, 80" Padding="20">
+
+        <Button Grid.Row="0"
+                Text="Pular"
+                Command="{Binding FinalizarApresentacaoCommand}"
+                IsVisible="{Binding MostrarBotaoPular}"
+                HorizontalOptions="End"
+                BackgroundColor="Transparent"
+                TextColor="{StaticResource Gray600}"
+                FontAttributes="Bold" />
+
+        <CarouselView Grid.Row="1"
+                      ItemsSource="{Binding Slides}"
+                      Position="{Binding PosicaoAtual}"
+                      IndicatorView="IndicadorPagina"
+                      Loop="False"
+                      PeekAreaInsets="0">
+            <CarouselView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal" 
+                                   SnapPointsType="MandatorySingle" 
+                                   SnapPointsAlignment="Center" />
+            </CarouselView.ItemsLayout>
+
+            <CarouselView.ItemTemplate>
+                <DataTemplate>
+                    <Grid RowDefinitions="0.2*, 0.5*, 0.3*" Padding="10">
+
+                        <Label Grid.Row="0"
+                               Text="{Binding Titulo}"
+                               FontSize="26"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Gray900}"
+                               HorizontalTextAlignment="Center"
+                               VerticalOptions="Center" />
+
+                        <Image Grid.Row="1"
+                               Source="{Binding Imagem}"
+                               Aspect="AspectFit"
+                               HorizontalOptions="Fill"
+                               VerticalOptions="Fill"/>
+
+                        <Label Grid.Row="2"
+                               Text="{Binding Descricao}"
+                               FontSize="16"
+                               TextColor="{StaticResource Gray600}"
+                               HorizontalTextAlignment="Center"
+                               VerticalOptions="Start"
+                               LineBreakMode="WordWrap" />
+                    </Grid>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+
+        <IndicatorView x:Name="IndicadorPagina"
+                       Grid.Row="2"
+                       HorizontalOptions="Center"
+                       IndicatorColor="{StaticResource Gray400}"
+                       SelectedIndicatorColor="{StaticResource Primary}"
+                       Margin="0,10" />
+
+        <Button Grid.Row="3"
+                Text="{Binding TextoBotaoPrincipal}"
+                Command="{Binding AvancarOuFinalizarCommand}"
+                BackgroundColor="{StaticResource Primary}"
+                TextColor="{StaticResource White}"
+                HeightRequest="60"
+                FontSize="18"
+                FontAttributes="Bold"
+                CornerRadius="12"
+                VerticalOptions="Center" />
+
+    </Grid>
+</ContentPage>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.PacienteDetalhesPage"
+             x:DataType="vm:PacienteDetalhesViewModel"
+             Title="Detalhes do Paciente">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Frame CornerRadius="15" Padding="15" HasShadow="True">
+                <HorizontalStackLayout Spacing="15">
+                    <Border StrokeShape="RoundRectangle 40" HeightRequest="80" WidthRequest="80">
+                        <Image Source="{Binding Paciente.FotoPerfilPath}" Aspect="AspectFill" />
+                    </Border>
+
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                        <Label Text="{Binding Paciente.Nome}" FontAttributes="Bold" FontSize="18" />
+                        <Label Text="{Binding Paciente.DataNascimentoFormatada}" FontSize="14" />
+                        <Label Text="{Binding Paciente.Email}" FontSize="14" />
+                        <Label Text="{Binding Paciente.Telefone}" FontSize="14" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Frame>
+
+            <Button Text="Novo Tratamento" 
+                    Command="{Binding NovoTratamentoCommand}" 
+                    HorizontalOptions="Start"
+                    CornerRadius="10" />
+
+            <CollectionView ItemsSource="{Binding Tratamentos}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Tratamento">
+                        <Frame CornerRadius="20" Margin="0,0,0,15" Padding="20">
+                            <VerticalStackLayout Spacing="10">
+
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding Nome}" FontAttributes="Bold" FontSize="16" />
+                                        <Label Text="{Binding Descricao}" FontSize="13" TextColor="Gray" />
+                                        <Label Text="{Binding PeriodoFormatado}" FontSize="12" />
+                                    </VerticalStackLayout>
+
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Ativo}" Color="Gold" />
+                                </Grid>
+
+                                <Label Text="REMÉDIOS" FontAttributes="Bold" TextColor="Green" FontSize="11" Margin="0,10,0,0" />
+
+                                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Remedios}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="models:MedicamentoTratamento">
+                                            <VerticalStackLayout Spacing="1" Margin="0,0,0,12">
+                                                <Label Text="{Binding NomeMedicamento}" TextColor="Red" FontAttributes="Bold" />
+
+                                                <HorizontalStackLayout Spacing="10">
+                                                    <Label Text="{Binding IntervaloHoras, StringFormat='Intervalo: {0}h'}" FontSize="12" />
+                                                    <Label Text="{Binding Dosagem}" FontSize="12" />
+                                                </HorizontalStackLayout>
+
+                                                <Label Text="{Binding Instrucoes}" FontSize="12" TextColor="Gray" />
+                                            </VerticalStackLayout>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

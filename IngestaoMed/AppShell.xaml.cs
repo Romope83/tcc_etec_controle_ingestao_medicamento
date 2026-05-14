@@ -1,4 +1,5 @@
 ﻿using IngestaoMed.Views;
+using IngestaoMed.Views.Onboarding; // Namespace da sua nova pasta
 
 namespace IngestaoMed
 {
@@ -8,15 +9,15 @@ namespace IngestaoMed
         {
             InitializeComponent();
 
-            // Registramos as rotas das páginas que não estão fixas no ShellContent do XAML
-            // ou que queremos garantir o acesso via INavigationService.
-
+            // --- MANTENHA SEUS REGISTROS ORIGINAIS ---
             Routing.RegisterRoute(nameof(Views.CadastroMedicamentoPage), typeof(Views.CadastroMedicamentoPage));
             Routing.RegisterRoute(nameof(Views.ListaMedicamentosPage), typeof(Views.ListaMedicamentosPage));
             Routing.RegisterRoute(nameof(ListaPacientesPage), typeof(ListaPacientesPage));
             Routing.RegisterRoute(nameof(CadastroPacientePage), typeof(CadastroPacientePage));
-            // Dica: Se CadastroPage e LoginPage já estão no XAML com Route="...", 
-            // o Shell já as reconhece, mas registrar aqui com nameof evita erros de digitação.
+            Routing.RegisterRoute(nameof(PacienteDetalhesPage), typeof(PacienteDetalhesPage));
+            // --- ADICIONE OS NOVOS REGISTROS ---
+            Routing.RegisterRoute("WelcomePage", typeof(WelcomePage));
+            Routing.RegisterRoute("RegisterCuidadorPage", typeof(Views.Onboarding.RegisterCuidadorPage));
         }
     }
 }

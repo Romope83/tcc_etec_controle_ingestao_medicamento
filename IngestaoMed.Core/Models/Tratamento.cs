@@ -1,5 +1,4 @@
 ﻿using SQLite;
-using NotNull = SQLite.NotNullAttribute;
 using System.Diagnostics.CodeAnalysis;
 
 namespace IngestaoMed.Core.Models
@@ -13,11 +12,30 @@ namespace IngestaoMed.Core.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        [NotNull]
-        public required string Nome { get; set; }
+        public string Nome { get; set; }
+        public string Descricao { get; set; }
 
-        public string? Descricao { get; set; }
+        [Indexed]
+        public int PacienteId { get; set; }
+
+        public string Dosagem { get; set; } = string.Empty;
+
+        public int IntervaloHoras { get; set; }
+
+        public DateTime DataInicio { get; set; }
+
+        public DateTime? DataFim { get; set; }
 
         public bool Ativo { get; set; } = true;
+
+        [Ignore]
+        public string? NomePaciente { get; set; }
+
+        [Ignore]
+        public List<MedicamentoTratamento> Remedios { get; set; } = new();
+
+        [Ignore]
+        public string PeriodoFormatado => $"{DataInicio:dd/MM/yyyy} até {(DataFim.HasValue ? DataFim.Value.ToString("dd/MM/yyyy") : "Contínuo")}";
     }
+
 }

@@ -3,38 +3,72 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
              x:Class="IngestaoMed.Views.CadastroPacientePage"
-             Title="Novo Paciente"
-             x:DataType="vm:CadastroPacienteViewModel">
+             x:DataType="vm:CadastroPacienteViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="White">
 
     <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="30">
+        <VerticalStackLayout Spacing="25" Padding="30">
 
             <Label Text="Cadastrar Paciente" 
-                   FontSize="24" 
+                   FontSize="18" 
                    FontAttributes="Bold" 
-                   HorizontalOptions="Center" />
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center" 
+                   Margin="0,10,0,5"/>
 
-            <VerticalStackLayout Spacing="5">
-                <Label Text="Nome do Paciente *" FontSize="14" TextColor="Gray" />
+            <VerticalStackLayout HorizontalOptions="Center" Spacing="5">
+                <Border StrokeShape="RoundRectangle 60" 
+                        HeightRequest="120" 
+                        WidthRequest="120"
+                        StrokeThickness="1"
+                        Stroke="#E0E0E0">
+                    <Image Source="{Binding FotoPerfilPath, TargetNullValue='idosa_icon.png'}" 
+                           Aspect="AspectFill" />
+                </Border>
+                <Button Text="Alterar Foto" 
+                        FontSize="12" 
+                        TextColor="{StaticResource Primary}"
+                        BackgroundColor="Transparent"
+                        Padding="0"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Nome do Paciente" FontSize="14" TextColor="{StaticResource Primary}" />
                 <Entry Text="{Binding Nome}" 
-                       ClearButtonVisibility="WhileEditing" />
+                       Placeholder="Digite o nome completo" />
             </VerticalStackLayout>
 
-            <VerticalStackLayout Spacing="5">
-                <Label Text="Telefone" FontSize="14" TextColor="Gray" />
-                <Entry Text="{Binding Telefone}" />
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Data de Nascimento" FontSize="14" TextColor="{StaticResource Primary}" />
+                <DatePicker Date="{Binding DataNascimento}" 
+                            Format="dd/MM/yyyy" />
             </VerticalStackLayout>
 
-            <VerticalStackLayout Spacing="5">
-                <Label Text="Email" FontSize="14" TextColor="Gray" />
-                <Entry Text="{Binding Email}"/>
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Telefone" FontSize="14" TextColor="{StaticResource Primary}" />
+                <Entry Text="{Binding Telefone}" 
+                       Keyboard="Telephone" 
+                       Placeholder="(00) 00000-0000" />
             </VerticalStackLayout>
 
-            <Button Text="Salvar Paciente" 
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Email" FontSize="14" TextColor="{StaticResource Primary}" />
+                <Entry Text="{Binding Email}" 
+                       Keyboard="Email" 
+                       Placeholder="email@exemplo.com" />
+            </VerticalStackLayout>
+
+            <Button Text="SALVAR PACIENTE" 
                     Command="{Binding SalvarCommand}" 
-                    Margin="0, 20, 0, 0"
-                    BackgroundColor="{StaticResource Primary}"
-                    TextColor="White"/>
+                    BackgroundColor="{StaticResource Primary}" 
+                    TextColor="White"
+                    CornerRadius="25"
+                    HeightRequest="55"
+                    WidthRequest="260"
+                    HorizontalOptions="Center"
+                    Margin="0,25,0,0"
+                    FontAttributes="Bold"/>
 
         </VerticalStackLayout>
     </ScrollView>

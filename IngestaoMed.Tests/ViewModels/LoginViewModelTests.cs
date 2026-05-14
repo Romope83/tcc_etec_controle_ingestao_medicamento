@@ -36,7 +36,7 @@ namespace IngestaoMed.Tests.ViewModels
 
             // Assert
             // Verifica se o método de navegação foi chamado com a rota correta
-            _navigationMock.Verify(n => n.GoToAsync("//MainPage"), Times.Once);
+            _navigationMock.Verify(n => n.GoToAsync("//ListaPacientePage"), Times.Once);
 
             // Garante que nenhum alerta de erro foi exibido
             _dialogMock.Verify(d => d.DisplayAlert(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);

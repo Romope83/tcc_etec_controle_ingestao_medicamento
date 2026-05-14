@@ -17,5 +17,14 @@ namespace IngestaoMed.Services
             // e false se clicar no 'cancel'
             return await Shell.Current.DisplayAlert(title, message, accept, cancel);
         }
+        public async Task<bool> DisplayAlert(string title, string message, string accept, string cancel)
+        {
+            if (Shell.Current != null)
+            {
+                return await Shell.Current.DisplayAlert(title, message, accept, cancel);
+            }
+            return false;
+        }
+
     }
 }
