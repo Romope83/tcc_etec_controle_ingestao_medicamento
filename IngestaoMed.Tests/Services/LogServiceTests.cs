@@ -27,7 +27,7 @@ namespace IngestaoMed.Tests.Services
             int id = 1;
             // Definimos que o remédio era para as 08:00 e agora são 08:15 (15 min de atraso)
             var horarioProgramado = DateTime.Now.AddMinutes(-15);
-            var agendamento = new Agendamento { Id = id, HorarioProgramado = horarioProgramado };
+            var agendamento = new Agendamento { Id = id, ProximoAlarme = horarioProgramado };
 
             _dbMock.Setup(d => d.BuscarPrimeiroAsync<Agendamento>(It.IsAny<Expression<Func<Agendamento, bool>>>()))
                    .ReturnsAsync(agendamento);
@@ -48,7 +48,7 @@ namespace IngestaoMed.Tests.Services
         {
             // Arrange
             int id = 1;
-            var agendamento = new Agendamento { Id = id, HorarioProgramado = DateTime.Now.AddMinutes(-5) };
+            var agendamento = new Agendamento { Id = id, ProximoAlarme = DateTime.Now.AddMinutes(-5) };
             _dbMock.Setup(d => d.BuscarPrimeiroAsync<Agendamento>(It.IsAny<Expression<Func<Agendamento, bool>>>()))
                    .ReturnsAsync(agendamento);
 
@@ -76,25 +76,6 @@ namespace IngestaoMed.Tests.Services
             _dbMock.Verify(d => d.InserirAsync(It.IsAny<LogEvento>()), Times.Never);
         }
 
-        [Fact]
-        public async Task ObterLogsPorTratamentoAsync_DeveFiltrarCorretamente()
-        {
-            // Arrange
-            int tratamentoId = 10;
-            var logs = new List<LogEvento>
-            {
-                new LogEvento { Id = 1, Agendamento = new Agendamento { TratamentoId = tratamentoId } },
-                new LogEvento { Id = 2, Agendamento = new Agendamento { TratamentoId = 99 } } // Outro tratamento
-            };
 
-            _dbMock.Setup(d => d.BuscarTodosAsync<LogEvento>()).ReturnsAsync(logs);
-
-            // Act
-            var resultado = await _service.ObterLogsPorTratamentoAsync(tratamentoId);
-
-            // Assert
-            Assert.Single(resultado);
-            Assert.Equal(tratamentoId, resultado[0].Agendamento!.TratamentoId);
-        }
     }
 }

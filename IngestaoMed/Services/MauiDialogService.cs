@@ -25,6 +25,14 @@ namespace IngestaoMed.Services
             }
             return false;
         }
+        public async Task<string> DisplayActionSheet(string title, string cancel, string destruction, params string[] buttons)
+        {
+            if (Shell.Current != null)
+            {
+                return await Shell.Current.DisplayActionSheet(title, cancel, destruction, buttons);
+            }
+            return cancel;
+        }
 
     }
 }

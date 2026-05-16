@@ -1,6 +1,7 @@
 ﻿using IngestaoMed.Core.Data;
 using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
+using System.Linq.Expressions;
 
 namespace IngestaoMed.Core.Services
 {
@@ -34,8 +35,12 @@ namespace IngestaoMed.Core.Services
         public async Task<bool> RemoverMedicamentoAsync(Medicamento medicamento)
         {
             var resultado = await _db.ExcluirAsync(medicamento);
-            return resultado > 0; // Se deletou 1 ou mais linhas, retorna true
+            return resultado > 0; 
         }
+        public async Task<Medicamento?> BuscarPrimeiroMedicamentoAsync(Expression<Func<Medicamento, bool>> predicado)
+        {
+            return await _db.BuscarPrimeiroAsync(predicado);
 
+        }
     }
 }

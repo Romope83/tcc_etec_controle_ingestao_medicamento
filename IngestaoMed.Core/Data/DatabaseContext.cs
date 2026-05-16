@@ -28,6 +28,7 @@ namespace IngestaoMed.Core.Data
             await _connection.CreateTableAsync<Agendamento>();
             await _connection.CreateTableAsync<Registro>();
             await _connection.CreateTableAsync<MedicamentoTratamento>();
+            await _connection.CreateTableAsync<AnexoMedia>();
         }
 
         public async Task<bool> InserirAsync<T>(T entidade) where T : new()

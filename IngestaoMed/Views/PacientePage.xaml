@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
-             x:Class="IngestaoMed.Views.CadastroPacientePage"
-             x:DataType="vm:CadastroPacienteViewModel"
+             x:Class="IngestaoMed.Views.PacientePage"
+             x:DataType="vm:PacienteViewModel"
              Shell.NavBarIsVisible="False"
              BackgroundColor="White">
 
@@ -27,6 +28,7 @@
                            Aspect="AspectFill" />
                 </Border>
                 <Button Text="Alterar Foto" 
+                        Command="{Binding AlterarFotoCommand}"
                         FontSize="12" 
                         TextColor="{StaticResource Primary}"
                         BackgroundColor="Transparent"
@@ -49,7 +51,11 @@
                 <Label Text="Telefone" FontSize="14" TextColor="{StaticResource Primary}" />
                 <Entry Text="{Binding Telefone}" 
                        Keyboard="Telephone" 
-                       Placeholder="(00) 00000-0000" />
+                       Placeholder="(00) 00000-0000">
+                        <Entry.Behaviors>
+                        <toolkit:MaskedBehavior Mask="(XX) XXXXX-XXXX" UnmaskedCharacter="X" />
+                    </Entry.Behaviors>
+                </Entry>
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="2">

@@ -9,15 +9,14 @@ namespace IngestaoMed
         {
             InitializeComponent();
 
-            // --- MANTENHA SEUS REGISTROS ORIGINAIS ---
             Routing.RegisterRoute(nameof(Views.CadastroMedicamentoPage), typeof(Views.CadastroMedicamentoPage));
             Routing.RegisterRoute(nameof(Views.ListaMedicamentosPage), typeof(Views.ListaMedicamentosPage));
-            Routing.RegisterRoute(nameof(ListaPacientesPage), typeof(ListaPacientesPage));
-            Routing.RegisterRoute(nameof(CadastroPacientePage), typeof(CadastroPacientePage));
+            Routing.RegisterRoute(nameof(PacientePage), typeof(PacientePage));
             Routing.RegisterRoute(nameof(PacienteDetalhesPage), typeof(PacienteDetalhesPage));
-            // --- ADICIONE OS NOVOS REGISTROS ---
-            Routing.RegisterRoute("WelcomePage", typeof(WelcomePage));
-            Routing.RegisterRoute("RegisterCuidadorPage", typeof(Views.Onboarding.RegisterCuidadorPage));
+            Routing.RegisterRoute(nameof(TratamentoPage), typeof(TratamentoPage));
+            Routing.RegisterRoute(nameof(AgendamentoPage), typeof(AgendamentoPage));
+            Routing.RegisterRoute(nameof(PacientePage), typeof(PacientePage));
+
         }
     }
 }

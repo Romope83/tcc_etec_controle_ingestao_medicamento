@@ -19,7 +19,7 @@ namespace IngestaoMed.Core.Services
 
             var conflitos = agendamentosExistentes
                 .Where(a => a.Status == "Pendente" &&
-                            novosHorarios.Any(h => Math.Abs((h - a.HorarioProgramado).TotalMinutes) < 30))
+                            novosHorarios.Any(h => Math.Abs((h - a.ProximoAlarme).TotalMinutes) < 30))
                 .ToList();
 
             return conflitos;

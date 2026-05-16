@@ -32,7 +32,7 @@ namespace IngestaoMed.Tests.Services
         {
             // Arrange
             int id = 1;
-            var agendamento = new Agendamento { Id = id, HorarioProgramado = DateTime.Now };
+            var agendamento = new Agendamento { Id = id, ProximoAlarme = DateTime.Now };
 
             _schedulerMock.Setup(s => s.PodeAdiar(id)).Returns(true);
             _dbMock.Setup(d => d.BuscarPrimeiroAsync<Agendamento>(It.IsAny<Expression<Func<Agendamento, bool>>>()))

@@ -11,18 +11,19 @@ namespace IngestaoMed.Core.Models
         public int Id { get; set; }
 
         [Indexed, NotNull]
-        public int TratamentoId { get; set; }
-
-        [Indexed, NotNull]
         public int MedicamentoTratamentoId { get; set; }
 
         [NotNull]
-        public DateTime HorarioProgramado { get; set; }
+        public DateTime HorarioOriginal { get; set; }
+
+        [NotNull]
+        public DateTime ProximoAlarme { get; set; }
 
         [NotNull]
         public string Status { get; set; } = "Pendente";
 
-        public DateTime? HorarioRealizado { get; set; }
+        public DateTime? HorarioConfirmacao { get; set; }
+        public int QuantidadeSonecas { get; set; } = 0;
 
         [Ignore]
         public Tratamento? Tratamento { get; set; }
