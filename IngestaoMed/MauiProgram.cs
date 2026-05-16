@@ -77,10 +77,12 @@ namespace IngestaoMed
             builder.Services.AddSingleton<IMedicamentoService, MedicamentoService>();
             builder.Services.AddSingleton<IPacienteService, PacienteService>();
             builder.Services.AddSingleton<ILogService, LogService>();
-            builder.Services.AddTransient<ICalculadoraAdesao, CalculadoraAdesaoService>();
+            builder.Services.AddSingleton<IMediaPickerService, MauiMediaPickerService>();  
             builder.Services.AddSingleton<IConnectivityService, ConnectivityService>();
+            builder.Services.AddTransient<ICalculadoraAdesao, CalculadoraAdesaoService>();
             builder.Services.AddScoped<IEmailOutboxProcessor, EmailOutboxProcessor>();
-            builder.Services.AddScoped<IMediaManagerService, MediaManagerService>();
+            builder.Services.AddScoped<IMediaManagerService, MediaManagerService>(); 
+            builder.Services.AddScoped<ITratamentoService, TratamentoService>();
             // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
 
             // Registre as ViewModels
@@ -89,11 +91,14 @@ namespace IngestaoMed
             builder.Services.AddTransient<CadastroMedicamentoViewModel>();
             builder.Services.AddTransient<ListaMedicamentosViewModel>();
             builder.Services.AddTransient<ListaPacientesViewModel>();
-            builder.Services.AddTransient<CadastroPacienteViewModel>();
+            builder.Services.AddTransient<PacienteViewModel>();
             builder.Services.AddTransient<AlarmeViewModel>();
             builder.Services.AddTransient<WelcomeViewModel>();
             builder.Services.AddTransient<TratamentoViewModel>();
             builder.Services.AddTransient<PacienteDetalhesViewModel>();
+            //builder.Services.AddTransient<EdicaoTratamentoViewModel>();
+            builder.Services.AddTransient<AgendamentoViewModel>();
+
             //builder.Services.AddTransient<RegisterCuidadorViewModel>();
             // Registre as Pages
             builder.Services.AddTransient<CadastroPage>();
@@ -101,7 +106,7 @@ namespace IngestaoMed
             builder.Services.AddTransient<ListaMedicamentosPage>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<ListaPacientesPage>();
-            builder.Services.AddTransient<CadastroPacientePage>();
+            builder.Services.AddTransient<PacientePage>();
             builder.Services.AddTransient<WelcomePage>();
             builder.Services.AddTransient<RegisterCuidadorPage>();
             builder.Services.AddTransient<PacienteDetalhesPage>();

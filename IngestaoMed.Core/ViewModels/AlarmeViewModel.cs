@@ -26,7 +26,7 @@ namespace IngestaoMed.Core.ViewModels
             if (AgendamentoAtual == null) return;
 
             AgendamentoAtual.Status = "Realizado";
-            AgendamentoAtual.HorarioRealizado = DateTime.Now;
+            AgendamentoAtual.HorarioConfirmacao = DateTime.Now;
 
             await _db.AtualizarAsync(AgendamentoAtual);
 

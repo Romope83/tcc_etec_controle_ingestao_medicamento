@@ -1,4 +1,5 @@
 ﻿using IngestaoMed.Core.Models;
+using System.Linq.Expressions;
 
 namespace IngestaoMed.Core.Interfaces
 {
@@ -10,5 +11,6 @@ namespace IngestaoMed.Core.Interfaces
         Task<List<Medicamento>> ObterTodosAsync();
 
         Task<bool> RemoverMedicamentoAsync(Medicamento medicamento);
+        Task<Medicamento?> BuscarPrimeiroMedicamentoAsync(Expression<Func<Medicamento, bool>> predicado);
     }
 }

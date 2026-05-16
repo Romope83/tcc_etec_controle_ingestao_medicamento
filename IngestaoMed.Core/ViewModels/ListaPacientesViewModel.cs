@@ -57,7 +57,7 @@ namespace IngestaoMed.Core.ViewModels
         [RelayCommand]
         private async Task NavegarParaCadastroAsync()
         {
-            await _nav.GoToAsync("CadastroPacientePage");
+            await _nav.GoToAsync("PacientePage");
         }
 
         [RelayCommand]
@@ -79,12 +79,16 @@ namespace IngestaoMed.Core.ViewModels
 
         private async Task AtualizarListaUI(List<Paciente> lista)
         {
-            Pacientes.Clear();
-            foreach (var p in lista)
-            {
-                Pacientes.Add(p);
-            }
-            return; 
+            await Task.Run(
+                () =>
+                {
+                    Pacientes.Clear();
+                    foreach (var p in lista)
+                    {
+                        Pacientes.Add(p);
+                    }
+                }
+            );
         }
         partial void OnTextoBuscaChanged(string value)
         {

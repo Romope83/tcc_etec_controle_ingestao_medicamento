@@ -25,24 +25,46 @@ namespace IngestaoMed.Core.Services
                 var totais = (await _db.BuscarOndeAsync<Tratamento>(t => t.PacienteId == p.Id)).Count;
                 p.ResumoTratamentos = $"Tratamentos {ativos:D2}/{totais:D2}";
 
-                var proximo = await _db.BuscarPrimeiroAsync<Agendamento>(a =>
-                    a.TratamentoId > 0 && 
-                    a.Status == "Pendente" &&
-                    a.HorarioProgramado >= DateTime.Now);
+                var tratamentosDoPaciente = await _db.BuscarOndeAsync<Tratamento>(t => t.PacienteId == p.Id);
+                var idsTratamentos = tratamentosDoPaciente.Select(t => t.Id).ToList();
 
-                if (proximo != null)
+                if (idsTratamentos.Any())
                 {
-                    p.ProximaData = proximo.HorarioProgramado.ToString("dd.MM.yyyy");
-                    p.ProximoHorario = proximo.HorarioProgramado.ToString("HH:mm");
+                    var medicamentosVinculados = await _db.BuscarOndeAsync<MedicamentoTratamento>(mt =>
+                        idsTratamentos.Contains(mt.TratamentoId));
+
+                    var idsVinculos = medicamentosVinculados.Select(mt => mt.Id).ToList();
+
+                    if (idsVinculos.Any())
+                    {
+                        var proximo = await _db.BuscarPrimeiroAsync<Agendamento>(a =>
+                            idsVinculos.Contains(a.MedicamentoTratamentoId) &&
+                            a.Status == "Pendente" &&
+                            a.ProximoAlarme >= DateTime.Now);
+
+                        if (proximo != null)
+                        {
+                            p.ProximaData = proximo.HorarioOriginal.ToString("dd.MM.yyyy");
+                            p.ProximoHorario = proximo.HorarioOriginal.ToString("HH:mm");
+                        }
+                    }
                 }
             }
             return pacientes;
         }
 
-        public async Task<bool> SalvarPacienteAsync(Paciente paciente)
+        public async Task<bool> SalvarOuAtualizarPacienteAsync(Paciente paciente)
         {
-            return await _db.InserirAsync(paciente);
+            if (paciente.Id > 0)
+            {
+                return await _db.AtualizarAsync(paciente) > 0;
+            }
+            else
+            {
+                return await _db.InserirAsync(paciente);
+            }
         }
+        
 
         public async Task<bool> RemoverPacienteAsync(Paciente paciente) =>
             await _db.ExcluirAsync(paciente) > 0;
@@ -91,6 +113,12 @@ namespace IngestaoMed.Core.Services
             paciente.Tratamentos = tratamentos;
 
             return paciente;
+        }
+
+
+        public async Task<Paciente?> BuscarPacientePorIdAsync(int pacienteId)
+        {
+            return await _db.BuscarPrimeiroAsync<Paciente>(x => x.Id == pacienteId);
         }
     }
 }

@@ -33,5 +33,26 @@ namespace IngestaoMed.Core.Services
             await _db.InserirAsync(anexo);
             return caminhoFinal;
         }
+
+        public async Task<string?> RegistrarFotoPacienteAsync(int pacienteId, string caminhoTemporario)
+        {
+            if (string.IsNullOrWhiteSpace(caminhoTemporario) || !File.Exists(caminhoTemporario))
+                return null;
+
+            byte[] fotosBytes = await File.ReadAllBytesAsync(caminhoTemporario);
+            string nomeUnico = $"paciente_{pacienteId}_{Guid.NewGuid()}.jpg";
+
+            string caminhoFinal = await _storage.SalvarArquivoAsync(fotosBytes, nomeUnico);
+
+            var anexo = new AnexoMedia
+            {
+                ReferenciaId = pacienteId,
+                TipoReferencia = "Paciente",
+                CaminhoLocal = caminhoFinal
+            };
+
+            await _db.InserirAsync(anexo);
+            return caminhoFinal;
+        }
     }
 }
