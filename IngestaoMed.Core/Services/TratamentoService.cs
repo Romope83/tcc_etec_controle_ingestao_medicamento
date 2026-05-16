@@ -2,6 +2,7 @@ using IngestaoMed.Core.Data;
 using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace IngestaoMed.Core.Services
@@ -22,16 +23,26 @@ namespace IngestaoMed.Core.Services
 
         public async Task<List<MedicamentoTratamento>> ObterMedicamentosVinculadosAsync(int tratamentoId)
         {
-            var listaRemedios = await _db.BuscarOndeAsync<MedicamentoTratamento>(m => m.TratamentoId == tratamentoId)
-                ?? new List<MedicamentoTratamento>();
+            var remedios = await _db.BuscarOndeAsync<MedicamentoTratamento>(m => m.TratamentoId == tratamentoId);
 
-            foreach (var r in listaRemedios)
+            foreach (var r in remedios)
             {
                 var med = await _db.BuscarPrimeiroAsync<Medicamento>(x => x.Id == r.MedicamentoId);
                 r.NomeMedicamento = med?.NomeComercial;
+                r.FotoPath = med?.FotoPath;
+                r.FormaIngestao = med?.FormaIngestao;
+                r.UnidadeDosagem = med?.UnidadeDosagem;
+
+
+                var agendamentos = await _db.BuscarOndeAsync<Agendamento>(a => a.MedicamentoTratamentoId == r.Id);
+                if (agendamentos.Any())
+                {
+                    r.DataPrimeiraDose = agendamentos.Min(a => a.HorarioOriginal);
+                    r.DataUltimaDose = agendamentos.Max(a => a.HorarioOriginal);
+                }
             }
 
-            return listaRemedios;
+            return remedios;
         }
 
         public async Task<(Tratamento? Tratamento, List<MedicamentoTratamento> Medicamentos)> ObterTratamentoComMedicamentosAsync(int id)
@@ -64,6 +75,10 @@ namespace IngestaoMed.Core.Services
         public async Task<int> ExcluirMedicamentoTratamentoAsync(MedicamentoTratamento vinculo)
         {
             return await _db.ExcluirAsync(vinculo);
+        }
+        public async Task<List<MedicamentoTratamento>> ObterOndeMedicamentoVinculadoAsync(Expression<Func<MedicamentoTratamento, bool>> predicado)
+        {
+            return await _db.BuscarOndeAsync(predicado);
         }
     }
 }

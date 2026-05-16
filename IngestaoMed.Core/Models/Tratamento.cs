@@ -32,6 +32,19 @@ namespace IngestaoMed.Core.Models
 
         [Ignore]
         public string PeriodoFormatado => $"{DataInicio:dd/MM/yyyy} até {(DataFim.HasValue ? DataFim.Value.ToString("dd/MM/yyyy") : "Contínuo")}";
+        [Ignore]
+        public int QtdRemedios { get; set; }
+
+        [Ignore]
+        public int TotalDosesTratamento { get; set; }
+
+        [Ignore]
+        public int DosesTomadasTratamento { get; set; }
+
+        [Ignore]
+        public string StatusAndamento => DosesTomadasTratamento >= TotalDosesTratamento && TotalDosesTratamento > 0
+            ? "Finalizado"
+            : "Em andamento";
     }
 
 }

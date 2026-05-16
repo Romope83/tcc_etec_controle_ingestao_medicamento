@@ -3,6 +3,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 namespace IngestaoMed.Core.ViewModels
 {
     public partial class ListaMedicamentosViewModel : ObservableObject
@@ -10,9 +14,14 @@ namespace IngestaoMed.Core.ViewModels
         private readonly IMedicamentoService _medicamentoService;
         private readonly INavigationService _navigationService;
         private readonly IDialogService _dialogService;
+
+        private List<Medicamento> _listaCompleta = new();
+
         public ObservableCollection<Medicamento> Medicamentos { get; } = new();
 
-        // Atualize o construtor para receber o IDialogService
+        [ObservableProperty]
+        private string _textoBusca = string.Empty;
+
         public ListaMedicamentosViewModel(IMedicamentoService medicamentoService,
                                           INavigationService navigationService,
                                           IDialogService dialogService)
@@ -21,58 +30,51 @@ namespace IngestaoMed.Core.ViewModels
             _navigationService = navigationService;
             _dialogService = dialogService;
         }
-        public ListaMedicamentosViewModel(IMedicamentoService medicamentoService, INavigationService navigationService)
-        {
-            _medicamentoService = medicamentoService;
-            _navigationService = navigationService;
-        }
 
         [RelayCommand]
         private async Task CarregarMedicamentosAsync()
         {
-            var lista = await _medicamentoService.ObterTodosAsync();
+            // Busca a lista atualizada do banco de dados
+            _listaCompleta = await _medicamentoService.ObterTodosAsync();
 
+            // Aplica o filtro existente (caso o usuário tenha digitado algo antes do refresh)
+            FiltrarLista();
+        }
+
+        // Executa automaticamente sempre que a propriedade TextoBusca for alterada no XAML
+        partial void OnTextoBuscaChanged(string value)
+        {
+            FiltrarLista();
+        }
+
+        private void FiltrarLista()
+        {
             Medicamentos.Clear();
-            foreach (var med in lista)
+
+            var resultado = string.IsNullOrWhiteSpace(TextoBusca)
+                ? _listaCompleta
+                : _listaCompleta.Where(m => m.NomeComercial != null &&
+                                            m.NomeComercial.Contains(TextoBusca, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var med in resultado)
             {
                 Medicamentos.Add(med);
             }
         }
 
         [RelayCommand]
-        private async Task NavegarParaCadastroAsync()
+        private async Task NavegarParaCadastroAsync(object? param)
         {
-            await _navigationService.GoToAsync("CadastroMedicamentoPage");
-        }
-
-            [RelayCommand]
-            private async Task RemoverMedicamentoAsync(Medicamento medicamento)
+            // Se o parâmetro for um ID válido (int), envia na QueryString para abrir em modo edição
+            if (param is int id && id > 0)
             {
-                if (medicamento == null) return;
-
-                // 1. Pede confirmação ao usuário
-                bool confirmar = await _dialogService.DisplayConfirmationAsync(
-                    "Excluir",
-                    $"Deseja realmente remover o medicamento {medicamento.NomeComercial}?",
-                    "Sim", "Não");
-
-                if (!confirmar) return;
-
-                // 2. Remove do banco de dados
-                bool sucesso = await _medicamentoService.RemoverMedicamentoAsync(medicamento);
-
-                if (sucesso)
-                {
-                    // 3. Remove da interface em tempo real (MainThread para evitar travamentos)
-                    
-                    
-                        Medicamentos.Remove(medicamento);
-                    
-                }
-                else
-                {
-                    await _dialogService.DisplayAlert("Erro", "Não foi possível remover o medicamento.", "OK");
-                }
+                await _navigationService.GoToAsync($"MedicamentoPage?id={id}");
+            }
+            else
+            {
+                // Caso contrário (clique no botão flutuante de "+"), abre o formulário limpo
+                await _navigationService.GoToAsync("MedicamentoPage");
             }
         }
     }
+}

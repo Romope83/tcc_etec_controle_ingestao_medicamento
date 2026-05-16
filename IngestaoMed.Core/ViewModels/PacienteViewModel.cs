@@ -89,23 +89,6 @@ namespace IngestaoMed.Core.ViewModels
             EhEdicao = false;
         }
 
-        partial void OnTelefoneChanged(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value)) return;
-
-            var numeros = Regex.Replace(value, @"[^\d]", "");
-
-            if (numeros.Length > 11) numeros = numeros.Substring(0, 11);
-
-            if (numeros.Length >= 11)
-            {
-                Telefone = $"({numeros.Substring(0, 2)}) {numeros.Substring(2, 5)}-{numeros.Substring(7)}";
-            }
-            else if (numeros.Length >= 7)
-            {
-                Telefone = $"({numeros.Substring(0, 2)}) {numeros.Substring(2, 4)}-{numeros.Substring(6)}";
-            }
-        }
 
         [RelayCommand]
         private async Task SalvarAsync()
@@ -132,15 +115,18 @@ namespace IngestaoMed.Core.ViewModels
 
             bool sucesso;
 
+            string telefoneApenasNumeros = Regex.Replace(Telefone ?? string.Empty, @"[^\d]", "");
+
             if (EhEdicao)
             {
                 var pacienteExistente = await _pacienteService.BuscarPacientePorIdAsync(_pacienteIdAtual);
+
 
                 if (pacienteExistente != null)
                 {
                     // Atualiza apenas os dados modificados na tela
                     pacienteExistente.Nome = Nome;
-                    pacienteExistente.Telefone = Telefone;
+                    pacienteExistente.Telefone = telefoneApenasNumeros;
                     pacienteExistente.Email = Email;
                     pacienteExistente.DataNascimento = DataNascimento;
                     pacienteExistente.FotoPerfilPath = FotoPerfilPath;
@@ -159,7 +145,7 @@ namespace IngestaoMed.Core.ViewModels
                 var novoPaciente = new Paciente
                 {
                     Nome = Nome,
-                    Telefone = Telefone,
+                    Telefone = telefoneApenasNumeros,
                     Email = Email,
                     DataNascimento = DataNascimento,
                     FotoPerfilPath = FotoPerfilPath

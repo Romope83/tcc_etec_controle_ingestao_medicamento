@@ -25,5 +25,26 @@ namespace IngestaoMed.Core.Models
 
         [Ignore]
         public string? NomeMedicamento { get; set; }
+        [Ignore]
+        public string? FotoPath { get; set; }
+
+        [Ignore]
+        public string? FormaIngestao { get; set; }
+
+        [Ignore]
+        public int DosesTomadas { get; set; }
+
+        [Ignore]
+        public int TotalDoses { get; set; }
+
+        [Ignore]
+        public string ResumoDoses => $"{DosesTomadas:D2}/{TotalDoses:D2}";
+
+        [Ignore]
+        public DateTime? DataPrimeiraDose { get; set; }
+        [Ignore]
+        public DateTime? DataUltimaDose { get; set; }
+        [Ignore] 
+        public string? UnidadeDosagem { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace IngestaoMed
         {
             InitializeComponent();
 
-            Routing.RegisterRoute(nameof(Views.CadastroMedicamentoPage), typeof(Views.CadastroMedicamentoPage));
+            Routing.RegisterRoute(nameof(Views.MedicamentoPage), typeof(Views.MedicamentoPage));
             Routing.RegisterRoute(nameof(Views.ListaMedicamentosPage), typeof(Views.ListaMedicamentosPage));
             Routing.RegisterRoute(nameof(PacientePage), typeof(PacientePage));
             Routing.RegisterRoute(nameof(PacienteDetalhesPage), typeof(PacienteDetalhesPage));

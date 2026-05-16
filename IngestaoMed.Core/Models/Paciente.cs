@@ -1,6 +1,7 @@
-﻿using SQLite;
-using NotNull = SQLite.NotNullAttribute;
+﻿using IngestaoMed.Core.Extensions;
+using SQLite;
 using System.Diagnostics.CodeAnalysis;
+using NotNull = SQLite.NotNullAttribute;
 
 namespace IngestaoMed.Core.Models
 {
@@ -44,5 +45,7 @@ namespace IngestaoMed.Core.Models
         public string ProximoHorario { get; set; } = "--";
         [Ignore]
         public bool TemAgendamento { get; set; }
+        [Ignore]
+        public string TelefoneFormatado => Telefone.FormatarTelefone();
     }
 }

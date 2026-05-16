@@ -49,11 +49,14 @@
 
             <VerticalStackLayout Spacing="2">
                 <Label Text="Telefone" FontSize="14" TextColor="{StaticResource Primary}" />
-                <Entry Text="{Binding Telefone}" 
+
+                <Entry Text="{Binding Telefone}"
                        Keyboard="Telephone" 
                        Placeholder="(00) 00000-0000">
-                        <Entry.Behaviors>
-                        <toolkit:MaskedBehavior Mask="(XX) XXXXX-XXXX" UnmaskedCharacter="X" />
+                    <Entry.Behaviors>
+                        <toolkit:MaskedBehavior x:Name="MascaraTelefone"
+                              Mask="(XX) XXXXX-XXXX" 
+                              UnmaskedCharacter="X" />
                     </Entry.Behaviors>
                 </Entry>
             </VerticalStackLayout>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             xmlns:data="clr-namespace:IngestaoMed.Core.Data;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.MedicamentoPage"
+             x:DataType="vm:MedicamentoViewModel"
+             BackgroundColor="White">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="25" Padding="30">
+
+            <Label Text="Editar Medicamento" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding Id}" Value="0">
+                        <Setter Property="Text" Value="Cadastrar Medicamento" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+
+            <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                <Border StrokeShape="RoundRectangle 60"
+                        HeightRequest="120"
+                        WidthRequest="120"
+                        StrokeThickness="2"
+                        Stroke="{StaticResource Primary}"
+                        BackgroundColor="#F0F0F0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelecionarFotoCommand}" />
+                    </Border.GestureRecognizers>
+
+                    <Image Source="{Binding FotoPath, TargetNullValue='remedio_placeholder.png'}"
+                           Aspect="AspectFill" />
+                </Border>
+                <Label Text="Toque para alterar a foto" 
+                       FontSize="12" 
+                       TextColor="Gray" 
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="18">
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Nome Comercial" FontSize="14" TextColor="Gray" />
+                    <Entry Text="{Binding NomeComercial}" 
+                           Placeholder="Ex: Dipirona, Losartana" 
+                           ClearButtonVisibility="WhileEditing" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Unidade" FontSize="14" TextColor="Gray" />
+                    <Picker 
+                            ItemsSource="{x:Static data:MedicamentoOpcoes.UnidadesDosagem}" 
+                            SelectedItem="{Binding UnidadeDosagem}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Forma de Ingestão" FontSize="14" TextColor="Gray" />
+                    <Picker
+                            ItemsSource="{x:Static data:MedicamentoOpcoes.FormasIngestao}" 
+                            SelectedItem="{Binding FormaIngestao}" />
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+
+            <Button Text="Atualizar Alterações" 
+                    Command="{Binding SalvarCommand}" 
+                    Margin="0,15,0,0"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding Id}" Value="0">
+                        <Setter Property="Text" Value="Salvar Medicamento" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+
+            <Button Text="Excluir Medicamento"
+                    Command="{Binding ExcluirCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="Red"
+                    FontSize="14"
+                    IsVisible="True">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding Id}" Value="0">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

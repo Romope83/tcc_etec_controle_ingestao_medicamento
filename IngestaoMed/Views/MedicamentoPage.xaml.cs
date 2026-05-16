@@ -3,26 +3,24 @@ using IngestaoMed.Core.ViewModels;
 namespace IngestaoMed.Views
 {
     [QueryProperty(nameof(IdRecebido), "id")]
-    public partial class PacientePage : ContentPage
+    public partial class MedicamentoPage : ContentPage
     {
-        private readonly PacienteViewModel _viewModel;
+        private readonly MedicamentoViewModel _viewModel;
 
-        public PacientePage(PacienteViewModel viewModel)
+        public MedicamentoPage(MedicamentoViewModel viewModel)
         {
             InitializeComponent();
             _viewModel = viewModel;
-            BindingContext = viewModel;
+            BindingContext = _viewModel;
         }
 
         public int IdRecebido
         {
-            set {
+            set
+            {
                 int id = value;
                 _ = _viewModel.InicializarAsync(id);
-
             }
-
-
         }
     }
 }
