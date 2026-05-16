@@ -32,7 +32,7 @@ namespace IngestaoMed.Tests.ViewModels
 
             // Assert
             Assert.Equal("Realizado", agendamento.Status);
-            Assert.NotNull(agendamento.HorarioRealizado);
+            Assert.NotNull(agendamento.HorarioConfirmacao);
 
             // Verifica se salvou no banco
             _dbMock.Verify(d => d.AtualizarAsync(agendamento), Times.Once);

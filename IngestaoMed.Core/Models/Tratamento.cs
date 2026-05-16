@@ -18,10 +18,6 @@ namespace IngestaoMed.Core.Models
         [Indexed]
         public int PacienteId { get; set; }
 
-        public string Dosagem { get; set; } = string.Empty;
-
-        public int IntervaloHoras { get; set; }
-
         public DateTime DataInicio { get; set; }
 
         public DateTime? DataFim { get; set; }

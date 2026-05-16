@@ -26,7 +26,7 @@ namespace IngestaoMed.Services.Notifications
                 CategoryType = NotificationCategoryType.Status,
                 Schedule = new NotificationRequestSchedule
                 {
-                    NotifyTime = agendamento.HorarioProgramado,
+                    NotifyTime = agendamento.ProximoAlarme,
                     Android = new AndroidScheduleOptions
                     {
                         AlarmType = AndroidAlarmType.RtcWakeup

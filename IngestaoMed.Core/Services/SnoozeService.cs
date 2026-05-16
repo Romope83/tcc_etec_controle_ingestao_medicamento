@@ -34,7 +34,7 @@ namespace IngestaoMed.Core.Services
                 throw new Exception("Agendamento não encontrado.");
 
             var novoHorario = DateTime.Now.AddMinutes(minutos);
-            agendamento.HorarioProgramado = novoHorario;
+            agendamento.ProximoAlarme = novoHorario;
 
             _snoozeScheduler.RegistrarSoneca(agendamentoId);
 

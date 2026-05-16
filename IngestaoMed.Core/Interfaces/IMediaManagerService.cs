@@ -3,5 +3,6 @@
     public interface IMediaManagerService
     {
         Task<string?> RegistrarFotoMedicamentoAsync(int medicamentoId, byte[] fotosBytes);
+        Task<string?> RegistrarFotoPacienteAsync(int pacienteId, string caminhoTemporario);
     }
 }

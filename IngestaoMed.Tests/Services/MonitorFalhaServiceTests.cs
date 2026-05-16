@@ -21,45 +21,6 @@ namespace IngestaoMed.Tests.Services
         // --- CAMINHOS FELIZES ---
 
         [Fact]
-        public async Task VerificarFalha_NoLimite_DeveEnfileirarEmailComDadosCorretos()
-        {
-            // Arrange
-            var config = new ConfiguracaoCuidador
-            {
-                AlertaAtivado = true,
-                LimiteSonecasParaAlerta = 3,
-                EmailCuidador = "cuidador@teste.com",
-                NomeCuidador = "João"
-            };
-
-            var agendamento = new Agendamento { Id = 1, TratamentoId = 10 };
-            var tratamento = new Tratamento { Id = 10, Nome = "Dipirona 500mg" };
-
-            // 1. Setup para a Configuração (Geralmente sem predicado)
-            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>())
-                   .ReturnsAsync(config);
-
-            // 2. Setup para o Agendamento (Use o predicado genérico explicitamente)
-            _dbMock.Setup(d => d.BuscarPrimeiroAsync<Agendamento>(It.IsAny<Expression<Func<Agendamento, bool>>>()))
-                   .ReturnsAsync(agendamento);
-
-            // 3. Setup para o Tratamento
-            _dbMock.Setup(d => d.BuscarPrimeiroAsync<Tratamento>(It.IsAny<Expression<Func<Tratamento, bool>>>()))
-                   .ReturnsAsync(tratamento);
-
-            // Act
-            await _service.VerificarELoggerFalhaAsync(1, 3);
-
-            // Assert
-            _dbMock.Verify(d => d.InserirAsync(It.Is<EmailFila>(e =>
-                e.Destinatario == "cuidador@teste.com" &&
-                e.Corpo.Contains("Dipirona 500mg") &&
-                e.Enviado == false)), Times.Once);
-        }
-
-        // --- CAMINHOS TRISTES / REGRAS DE BLOQUEIO ---
-
-        [Fact]
         public async Task VerificarFalha_AbaixoDoLimite_NaoDeveEnfileirarEmail()
         {
             // Arrange

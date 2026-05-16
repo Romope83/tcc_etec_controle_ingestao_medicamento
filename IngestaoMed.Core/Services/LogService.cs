@@ -25,7 +25,7 @@ namespace IngestaoMed.Core.Services
 
             if (tipo == TipoEventoLog.ConfirmacaoDireta || tipo == TipoEventoLog.ConfirmacaoComSoneca)
             {
-                var diferenca = agora - agendamento.HorarioProgramado;
+                var diferenca = agora - agendamento.ProximoAlarme;
                 minutosAtraso = diferenca.TotalMinutes > 0 ? (int)diferenca.TotalMinutes : 0;
             }
 
@@ -44,7 +44,7 @@ namespace IngestaoMed.Core.Services
         {
             var todosLogs = await _db.BuscarTodosAsync<LogEvento>();
 
-            return todosLogs.Where(l => l.Agendamento?.TratamentoId == tratamentoId).ToList();
+            return todosLogs.Where(l => l.Agendamento?.Tratamento?.Id == tratamentoId).ToList();
         }
     }
 }

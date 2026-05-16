@@ -93,19 +93,31 @@
 	  <Compile Update="Views\CadastroMedPage.xaml.cs">
 	    <DependentUpon>CadastroMedPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\PacientePage.xaml.cs">
+	    <DependentUpon>PacientePage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\TratamentoPage.xaml.cs">
+	    <DependentUpon>TratamentoPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\ListaMedicamentosPage.xaml.cs">
 	    <DependentUpon>ListaMedicamentosPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\AgendamentoPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\AlarmPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\CadastroMedPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\CadastroPacientePage.xaml">
+	  <MauiXaml Update="Views\PacientePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\TratamentoPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\ListaMedicamentosPage.xaml">

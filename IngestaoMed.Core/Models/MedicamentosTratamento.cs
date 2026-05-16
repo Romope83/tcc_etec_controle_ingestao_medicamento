@@ -16,7 +16,12 @@ namespace IngestaoMed.Core.Models
         public int MedicamentoId { get; set; }
         public string Dosagem { get; set; } = string.Empty;
         public int IntervaloHoras { get; set; }
-        public string Instrucoes { get; set; } = string.Empty; // ex: "via oral", "40 gotas"
+        public string Instrucoes { get; set; } = string.Empty;
+        public bool Ativo { get; set; } = true;
+        public int Tolerancia { get; set; } = 30;
+
+        [NotNull]
+        public DateTime DataCriacao { get; private set; } = DateTime.Now;
 
         [Ignore]
         public string? NomeMedicamento { get; set; }
