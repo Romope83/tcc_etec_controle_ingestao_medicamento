@@ -8,23 +8,33 @@
              xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
              Title="Meus Medicamentos">
 
-    <ContentPage.Behaviors>
- 
-    </ContentPage.Behaviors>
 
-    <Grid RowDefinitions="*, Auto" Padding="20">
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20">
 
-        <Label Text="Nenhum medicamento cadastrado." 
-               IsVisible="{Binding Medicamentos.Count, Converter={StaticResource IntToBoolConverter}}"
-               HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+        <!-- Barra de Pesquisa -->
+        <Border Grid.Row="0" Margin="0,0,0,10"
+            StrokeShape="RoundRectangle 25" StrokeThickness="0"
+            BackgroundColor="White" Padding="10,0" HeightRequest="50">
+            <Border.Shadow>
+                <Shadow Offset="0,2" Radius="5" Opacity="0.1" Brush="Black" />
+            </Border.Shadow>
+            <Grid ColumnDefinitions="Auto, *">
+                <Label Text="🔍" VerticalOptions="Center" Margin="10,0" />
+                <Entry Grid.Column="1"
+                   Text="{Binding TextoBusca}"
+                   Placeholder="Pesquisar..."
+                   PlaceholderColor="Gray"
+                   VerticalOptions="Center"
+                   BackgroundColor="Transparent" />
+            </Grid>
+        </Border>
 
-        <CollectionView Grid.Row="0" ItemsSource="{Binding Medicamentos}">
+        <!-- Lista de Medicamentos -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Medicamentos}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Medicamento">
                     <Frame Margin="0,0,0,10" Padding="15" CornerRadius="8" HasShadow="True">
-
                         <Grid ColumnDefinitions="*, Auto">
-
                             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                                 <Label Text="{Binding NomeComercial}" FontSize="18" FontAttributes="Bold" TextColor="Black" />
                                 <HorizontalStackLayout Spacing="10">
@@ -33,32 +43,23 @@
                                     <Label Text="{Binding FormaIngestao}" TextColor="Gray" />
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
-                            <Button Grid.Column="1" 
-                                    Text="🗑️" 
-                                    BackgroundColor="Transparent" 
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaMedicamentosViewModel}}, Path=RemoverMedicamentoCommand}"
-                                    CommandParameter="{Binding .}" />
-                            
-                            
-<!-->                       <ImageButton Grid.Column="1"
-                                Source 
-                                 WidthRequest="24"
-                                 HeightRequest="24"
-                                 VerticalOptions="Center"
-                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaMedicamentosViewModel}}, Path=RemoverMedicamentoCommand}"
-                                 CommandParameter="{Binding .}" /> !-->
+                            <Button Grid.Column="1"
+                                Text="🗑️"
+                                BackgroundColor="Transparent"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaMedicamentosViewModel}}, Path=RemoverMedicamentoCommand}"
+                                CommandParameter="{Binding .}" />
                         </Grid>
-
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Button Grid.Row="1" 
-                Text="+ Novo Medicamento" 
-                Command="{Binding NavegarParaCadastroCommand}"
-                BackgroundColor="{StaticResource Primary}" 
-                CornerRadius="25" 
-                Margin="0,10,0,0"/>
+        <!-- Botão Novo Medicamento -->
+        <Button Grid.Row="2"
+            Text="+ Novo Medicamento"
+            Command="{Binding NavegarParaCadastroCommand}"
+            BackgroundColor="{StaticResource Primary}"
+            CornerRadius="25"
+            Margin="0,10,0,0"/>
     </Grid>
 </ContentPage>

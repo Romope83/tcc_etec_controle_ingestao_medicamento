@@ -1,13 +1,13 @@
-using IngestaoMed.Core.ViewModels;
+    using IngestaoMed.Core.ViewModels;
 
-namespace IngestaoMed.Views
-{
-    public partial class CadastroMedicamentoPage : ContentPage
+    namespace IngestaoMed.Views
     {
-        public CadastroMedicamentoPage(CadastroMedicamentoViewModel viewModel)
+        public partial class CadastroMedicamentoPage : ContentPage
         {
-            InitializeComponent();
-            BindingContext = viewModel;
+            public CadastroMedicamentoPage(CadastroMedicamentoViewModel viewModel)
+            {
+                InitializeComponent();
+                BindingContext = viewModel;
+            }
         }
     }
-}
