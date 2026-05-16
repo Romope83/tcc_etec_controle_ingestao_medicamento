@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
-using IngestaoMed.Core.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -33,7 +32,7 @@ namespace IngestaoMed.Core.ViewModels
         [ObservableProperty] private string _descricao = string.Empty;
         [ObservableProperty] private DateTime _dataInicio = DateTime.Now;
         [ObservableProperty] private DateTime? _dataFim;
-        [ObservableProperty] private bool _ativado = false; // Inicia desativado por padrão conforme nova regra
+        [ObservableProperty] private bool _ativado = false;
 
         public string NomeTratamento
         {
@@ -108,7 +107,6 @@ namespace IngestaoMed.Core.ViewModels
 
             if (TratamentoId == 0 || _tratamentoAtual == null)
             {
-                // MODO CRIAÇÃO: Grava o novo registro como inativo
                 var novo = new Tratamento
                 {
                     Nome = Nome,
@@ -116,7 +114,7 @@ namespace IngestaoMed.Core.ViewModels
                     PacienteId = PacienteId,
                     DataInicio = DataInicio,
                     DataFim = DataFim,
-                    Ativo = false // Salva desativado por padrão
+                    Ativo = false
                 };
 
                 var id = await _tratamentoService.InserirTratamentoAsync(novo);
@@ -125,11 +123,9 @@ namespace IngestaoMed.Core.ViewModels
                 Ativado = false;
 
                 await _dialog.DisplayAlert("Sucesso", "Tratamento criado com sucesso!", "OK");
-                // Removido o avanço automático para a tela de agendamento daqui
             }
             else
             {
-                // MODO EDIÇÃO: Atualiza o registro existente em vez de criar outro
                 var t = await _tratamentoService.ObterPorIdAsync(TratamentoId);
                 if (t != null)
                 {
@@ -137,12 +133,12 @@ namespace IngestaoMed.Core.ViewModels
                     t.Descricao = Descricao;
                     t.DataInicio = DataInicio;
                     t.DataFim = DataFim;
-                    t.Ativo = Ativado; // Preserva o estado de ativação atual da tela
+                    t.Ativo = Ativado;
 
                     await _tratamentoService.AtualizarTratamentoAsync(t);
                     _tratamentoAtual = t;
 
-                    await _dialog.DisplayAlert("Sucesso", "Tratamento atualizado com sucesso!", "OK");
+                    await _dialog.DisplayAlert("Sucesso", "Tratamento updated com sucesso!", "OK");
                 }
             }
         }
@@ -156,7 +152,7 @@ namespace IngestaoMed.Core.ViewModels
                 PacienteId = PacienteId,
                 DataInicio = DataInicio,
                 DataFim = DataFim,
-                Ativo = false // Salva desativado por padrão
+                Ativo = false
             };
 
             var id = await _tratamentoService.InserirTratamentoAsync(t);
@@ -173,7 +169,6 @@ namespace IngestaoMed.Core.ViewModels
                 await SalvarTratamentoAutomatico();
             }
 
-            // O redirecionamento ocorre explicitamente apenas quando o usuário clica neste comando
             await _navigation.GoToAsync($"AgendamentoPage?tratamentoId={TratamentoId}");
         }
 
@@ -214,5 +209,13 @@ namespace IngestaoMed.Core.ViewModels
             }
         }
 
+        // COMANDO ADICIONADO: Direciona o clique no card do medicamento para a página de agendamentos
+        [RelayCommand]
+        private async Task SelecionarMedicamentoVinculadoAsync(MedicamentoTratamento medicamento)
+        {
+            if (medicamento == null) return;
+
+            await _navigation.GoToAsync($"AgendamentoPage?medicamentoTratamentoId={medicamento.Id}");
+        }
     }
 }

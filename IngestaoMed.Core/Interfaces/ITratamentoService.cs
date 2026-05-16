@@ -1,5 +1,6 @@
 using IngestaoMed.Core.Models;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace IngestaoMed.Core.Interfaces
@@ -15,5 +16,6 @@ namespace IngestaoMed.Core.Interfaces
         Task<int> ExcluirTratamentoAsync(Tratamento tratamento);
 
         Task<int> ExcluirMedicamentoTratamentoAsync(MedicamentoTratamento vinculo);
+        Task<List<MedicamentoTratamento>> ObterOndeMedicamentoVinculadoAsync(Expression<Func<MedicamentoTratamento, bool>> predicado);
     }
 }

@@ -18,12 +18,11 @@ namespace IngestaoMed.Core.Models
         public required string? NomeComercial { get; set; }
 
         [MaxLength(50)]
-        public string Dosagem { get; set; }
-
-        [MaxLength(50)]
         public string? FormaIngestao { get; set; }
 
         [MaxLength(255)]
         public string? FotoPath { get; set; }
+        [MaxLength(30)]
+        public string? UnidadeDosagem { get; set; }
     }
 }

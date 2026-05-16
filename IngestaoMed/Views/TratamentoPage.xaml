@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
              xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
              x:Class="IngestaoMed.Views.TratamentoPage"
@@ -8,7 +9,7 @@
              BackgroundColor="White">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="15">
+        <VerticalStackLayout Padding="20" Spacing="15" Margin="0,0,0,30">
 
             <Label Text="Editar Tratamento" 
                    FontSize="22" 
@@ -53,22 +54,19 @@
                 <Label VerticalOptions="Center" FontSize="16" TextColor="Gray">
                     <Label.Triggers>
                         <DataTrigger TargetType="Label" Binding="{Binding Source={x:Reference swAtivado}, Path=IsToggled}" Value="True">
-                            <Setter Property="Text" Value="Desativar tratamento" />
+                            <Setter Property="Text" Value="Tratamento Ativo" />
+                            <Setter Property="TextColor" Value="{StaticResource Primary}" />
                         </DataTrigger>
                         <DataTrigger TargetType="Label" Binding="{Binding Source={x:Reference swAtivado}, Path=IsToggled}" Value="False">
-                            <Setter Property="Text" Value="Ativar tratamento" />
+                            <Setter Property="Text" Value="Tratamento Desativado" />
+                            <Setter Property="TextColor" Value="Gray" />
                         </DataTrigger>
                     </Label.Triggers>
                 </Label>
             </HorizontalStackLayout>
 
             <VerticalStackLayout Spacing="10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
+                <Grid ColumnDefinitions="*, Auto">
                     <Button Grid.Column="0"
                             Text="Salvar" 
                             Command="{Binding SalvarCommand}"
@@ -113,68 +111,86 @@
                         HeightRequest="45" />
 
                 <VerticalStackLayout Spacing="10" Margin="0,10,0,0">
-                    <VerticalStackLayout.Triggers>
-                        <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding TratamentoId}" Value="0">
-                            <Setter Property="IsVisible" Value="False" />
-                        </DataTrigger>
-                    </VerticalStackLayout.Triggers>
-
                     <Label Text="Medicamentos e Horários" 
-           FontSize="16" 
-           FontAttributes="Bold" 
-           TextColor="Gray" 
-           Margin="5,0" />
+                           FontSize="16" 
+                           FontAttributes="Bold" 
+                           TextColor="Gray" 
+                           Margin="5,0" />
 
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding MedicamentosVinculados}" Spacing="12">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="models:MedicamentoTratamento">
                                 <Border StrokeShape="RoundRectangle 12"
-                        StrokeThickness="0"
-                        BackgroundColor="White"
-                        Padding="16"
-                        Margin="2,2,2,8">
+                                        StrokeThickness="1"
+                                        Stroke="#E0E0E0"
+                                        BackgroundColor="White"
+                                        Padding="16"
+                                        Margin="2,2,2,4">
                                     <Border.Shadow>
-                                        <Shadow Offset="0,4" Radius="8" Opacity="0.1" Brush="Black" />
+                                        <Shadow Offset="0,4" Radius="8" Opacity="0.08" Brush="Black" />
                                     </Border.Shadow>
 
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer 
-                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TratamentoViewModel}}, Path=SelecionarMedicamentoVinculadoCommand}"
-                            CommandParameter="{Binding .}" />
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TratamentoViewModel}}, Path=SelecionarMedicamentoVinculadoCommand}"
+                                            CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
 
-                                    <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-                                        <Border Grid.Column="0" 
-                                BackgroundColor="#F0F4F8" 
-                                StrokeShape="RoundRectangle 25" 
-                                HeightRequest="50" 
-                                WidthRequest="50"
-                                StrokeThickness="0">
-                                            <Label Text="💊" HorizontalOptions="Center" VerticalOptions="Center" FontSize="20"/>
-                                        </Border>
+                                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
 
-                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                                            <Label Text="{Binding NomeMedicamento}" 
-                                   FontAttributes="Bold" 
-                                   FontSize="16" 
-                                   TextColor="{StaticResource Primary}" />
-                                            <Label Text="{Binding Dosagem}" 
-                                   FontSize="13" 
-                                   TextColor="Gray" />
-                                            <HorizontalStackLayout Spacing="5">
-                                                <Label Text="🕒" FontSize="12" VerticalOptions="Center"/>
-                                                <Label Text="{Binding IntervaloHoras, StringFormat='A cada {0} horas'}" 
-                                       FontSize="12" 
-                                       TextColor="Gray" 
-                                       VerticalOptions="Center"/>
-                                            </HorizontalStackLayout>
+                                        <VerticalStackLayout Grid.Column="0" Spacing="10">
+
+                                            <Grid ColumnDefinitions="Auto, *" ColumnSpacing="12">
+                                                <Border Grid.Column="0" WidthRequest="45" HeightRequest="45" StrokeShape="RoundRectangle 8" StrokeThickness="0">
+                                                    <Image Source="{Binding FotoPath, TargetNullValue='remedio_placeholder.png'}" Aspect="AspectFill" />
+                                                </Border>
+
+                                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                    <Label Text="{Binding NomeMedicamento}" FontAttributes="Bold" FontSize="15" TextColor="Black" />
+                                                    <HorizontalStackLayout Spacing="5">
+                                                        <Label Text="{Binding FormaIngestao}" FontSize="12" TextColor="Gray" />
+                                                        <Label Text="{Binding Dosagem}" FontSize="12" TextColor="Gray" />
+                                                        <Label Text="{Binding UnidadeDosagem, StringFormat='({0})'}" FontSize="12" TextColor="Gray" />
+                                                    </HorizontalStackLayout>
+                                                </VerticalStackLayout>
+                                            </Grid>
+
+                                            <Line Stroke="#EEEEEE" X2="400" HorizontalOptions="Center" />
+
+                                            <Grid ColumnDefinitions="*, *, *" RowDefinitions="Auto, Auto" RowSpacing="2" ColumnSpacing="5">
+                                                <Label Grid.Row="0" Grid.Column="0" Text="Intervalo" FontSize="10" TextColor="Gray" />
+                                                <Label Grid.Row="1" Grid.Column="0" Text="{Binding IntervaloHoras, StringFormat='{0}h'}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Primary}"/>
+
+                                                <Label Grid.Row="0" Grid.Column="1" Text="Tolerância" FontSize="10" TextColor="Gray" />
+                                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Tolerancia, StringFormat='{0} min'}" FontSize="12" FontAttributes="Bold" TextColor="Orange" />
+
+                                                <Label Grid.Row="0" Grid.Column="2" Text="Doses Tomadas" FontSize="10" TextColor="Gray" HorizontalOptions="End" />
+                                                <Label Grid.Row="1" Grid.Column="2" Text="{Binding ResumoDoses, TargetNullValue='00/00'}" FontSize="12" FontAttributes="Bold" TextColor="Green" HorizontalOptions="End" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto" RowSpacing="2" ColumnSpacing="15" Margin="0,4,0,0">
+                                                <Label Grid.Row="0" Grid.Column="0" Text="Primeira Dose (Início)" FontSize="10" TextColor="Gray" />
+                                                <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="5">
+                                                    <Label Text="▶" FontSize="10" TextColor="Green" VerticalOptions="Center"/>
+                                                    <Label Text="{Binding DataPrimeiraDose, StringFormat='{0:dd/MM/yyyy HH:mm}', TargetNullValue='--'}" FontSize="12" FontAttributes="Bold" TextColor="Black" />
+                                                </HorizontalStackLayout>
+
+                                                <Label Grid.Row="0" Grid.Column="1" Text="Última Dose (Fim)" FontSize="10" TextColor="Gray" HorizontalOptions="End" />
+                                                <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="5" HorizontalOptions="End">
+                                                    <Label Text="{Binding DataUltimaDose, StringFormat='{0:dd/MM/yyyy HH:mm}', TargetNullValue='--'}" FontSize="12" FontAttributes="Bold" TextColor="Black" />
+                                                    <Label Text="■" FontSize="10" TextColor="DarkRed" VerticalOptions="Center"/>
+                                                </HorizontalStackLayout>
+                                            </Grid>
+
                                         </VerticalStackLayout>
 
-                                        <Label Grid.Column="2" 
-                               Text="›" 
-                               FontSize="28" 
-                               TextColor="LightGray" 
-                               VerticalOptions="Center" />
+                                        <Label Grid.Column="1" 
+                                               Text="›" 
+                                               FontSize="28" 
+                                               TextColor="LightGray" 
+                                               VerticalOptions="Center"
+                                               HorizontalOptions="End"
+                                               Margin="5,0,0,0"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

@@ -94,28 +94,32 @@ namespace IngestaoMed.Core.Services
         public async Task<Paciente?> ObterDetalhesCompletosAsync(int pacienteId)
         {
             var paciente = await _db.BuscarPrimeiroAsync<Paciente>(p => p.Id == pacienteId);
-
             if (paciente == null) return null;
 
             var tratamentos = await _db.BuscarOndeAsync<Tratamento>(t => t.PacienteId == pacienteId);
 
             foreach (var t in tratamentos)
             {
-                t.Remedios = await _db.BuscarOndeAsync<MedicamentoTratamento>(m => m.TratamentoId == t.Id);
+                var remedios = await _db.BuscarOndeAsync<MedicamentoTratamento>(m => m.TratamentoId == t.Id);
+                t.QtdRemedios = remedios.Count;
 
-                foreach (var r in t.Remedios)
+                int totalDoses = 0;
+                int dosesTomadas = 0;
+
+                foreach (var r in remedios)
                 {
-                    var med = await _db.BuscarPrimeiroAsync<Medicamento>(x => x.Id == r.MedicamentoId);
-                    r.NomeMedicamento = med?.NomeComercial;
+                    var agendamentos = await _db.BuscarOndeAsync<Agendamento>(a => a.MedicamentoTratamentoId == r.Id);
+                    totalDoses += agendamentos.Count;
+                    dosesTomadas += agendamentos.Count(a => a.Status == "Tomado");
                 }
+
+                t.TotalDosesTratamento = totalDoses;
+                t.DosesTomadasTratamento = dosesTomadas;
             }
 
             paciente.Tratamentos = tratamentos;
-
             return paciente;
         }
-
-
         public async Task<Paciente?> BuscarPacientePorIdAsync(int pacienteId)
         {
             return await _db.BuscarPrimeiroAsync<Paciente>(x => x.Id == pacienteId);

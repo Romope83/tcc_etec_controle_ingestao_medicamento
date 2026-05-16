@@ -65,7 +65,7 @@
 
     <ShellContent
         Title="Cadastrar Medicamento"
-        ContentTemplate="{DataTemplate views:CadastroMedicamentoPage}"
+        ContentTemplate="{DataTemplate views:MedicamentoPage}"
         Route="CadastroMedPage" 
         FlyoutItemIsVisible="False"/>
 
