@@ -7,6 +7,7 @@ namespace IngestaoMed.Core.Interfaces
 {
     public interface ITratamentoService
     {
+        Task<List<Tratamento>> ObterTodosAsync();
         Task<Tratamento?> ObterPorIdAsync(int id);
         Task<List<MedicamentoTratamento>> ObterMedicamentosVinculadosAsync(int tratamentoId);
         Task<(Tratamento? Tratamento, List<MedicamentoTratamento> Medicamentos)> ObterTratamentoComMedicamentosAsync(int id);

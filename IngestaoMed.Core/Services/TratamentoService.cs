@@ -80,5 +80,11 @@ namespace IngestaoMed.Core.Services
         {
             return await _db.BuscarOndeAsync(predicado);
         }
+
+        public async Task<List<Tratamento>> ObterTodosAsync()
+        {
+            return await _db.BuscarTodosAsync<Tratamento>();
+        }
+
     }
 }

@@ -53,7 +53,8 @@ namespace IngestaoMed
                 });
 
             // --- SERVIÇOS DE INFRAESTRUTURA E INTERFACE ---
-
+            builder.Services.AddTransient<ListaTratamentosViewModel>();
+            builder.Services.AddTransient<ListaTratamentosPage>();
             builder.Services.AddSingleton<IDialogService, MauiDialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
             builder.Services.AddSingleton<IVibrationService, VibrationService>();
