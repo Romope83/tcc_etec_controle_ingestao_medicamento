@@ -71,7 +71,7 @@
 
     <ShellContent
         Title="Registro do Cuidador"
-        ContentTemplate="{DataTemplate onboarding:RegisterCuidadorPage}"
+        ContentTemplate="{DataTemplate onboarding:CuidadorPage}"
         Route="RegisterCuidadorPage" 
         FlyoutItemIsVisible="False"/>
 

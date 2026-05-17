@@ -1,5 +1,5 @@
 ﻿using IngestaoMed.Views;
-using IngestaoMed.Views.Onboarding; // Namespace da sua nova pasta
+using IngestaoMed.Views.Onboarding;
 
 namespace IngestaoMed
 {
@@ -9,13 +9,14 @@ namespace IngestaoMed
         {
             InitializeComponent();
 
-            Routing.RegisterRoute(nameof(Views.MedicamentoPage), typeof(Views.MedicamentoPage));
-            Routing.RegisterRoute(nameof(Views.ListaMedicamentosPage), typeof(Views.ListaMedicamentosPage));
+            Routing.RegisterRoute(nameof(MedicamentoPage), typeof(MedicamentoPage));
+            Routing.RegisterRoute(nameof(ListaMedicamentosPage), typeof(ListaMedicamentosPage));
             Routing.RegisterRoute(nameof(PacientePage), typeof(PacientePage));
             Routing.RegisterRoute(nameof(PacienteDetalhesPage), typeof(PacienteDetalhesPage));
             Routing.RegisterRoute(nameof(TratamentoPage), typeof(TratamentoPage));
             Routing.RegisterRoute(nameof(AgendamentoPage), typeof(AgendamentoPage));
             Routing.RegisterRoute(nameof(PacientePage), typeof(PacientePage));
+            Routing.RegisterRoute(nameof(CuidadorPage), typeof(CuidadorPage));
             Routing.RegisterRoute(nameof(ListaTratamentosPage), typeof(ListaTratamentosPage));
 
         }

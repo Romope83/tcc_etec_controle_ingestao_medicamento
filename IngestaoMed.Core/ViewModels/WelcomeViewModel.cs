@@ -81,7 +81,7 @@ namespace IngestaoMed.Core.ViewModels
         private async Task FinalizarApresentacao()
         {
             _configuracao.EhPrimeiroAcesso = false;
-            await _navegacao.GoToAsync("//CadastroPage");
+            await _navegacao.GoToAsync("CuidadorPage");
         }
     }
 }

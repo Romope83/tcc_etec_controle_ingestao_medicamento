@@ -15,11 +15,19 @@ namespace IngestaoMed.Core.ViewModels
     {
         private readonly IDatabaseContext _db;
         private readonly INavigationService _navigation;
+        private readonly IDialogService _dialogService;
+        private readonly IAgendamentoConflitoService _conflitoService;
 
-        public AgendamentoViewModel(IDatabaseContext db, INavigationService navigation)
+        public AgendamentoViewModel(
+            IDatabaseContext db,
+            INavigationService navigation,
+            IDialogService dialogService,
+            IAgendamentoConflitoService conflitoService)
         {
             _db = db;
             _navigation = navigation;
+            _dialogService = dialogService;
+            _conflitoService = conflitoService;
         }
 
         [ObservableProperty] private int _tratamentoId;
@@ -216,6 +224,56 @@ namespace IngestaoMed.Core.ViewModels
         {
             if (MedicamentoSelecionado == null) return;
 
+            // 1. Resgata o Objeto Tratamento para coletar o PacienteId necessário para o serviço
+            var tratamentoAtual = await _db.BuscarPrimeiroAsync<Tratamento>(t => t.Id == TratamentoId);
+            if (tratamentoAtual == null)
+            {
+                await _dialogService.DisplayAlert("Erro", "Tratamento de origem não encontrado.", "OK");
+                return;
+            }
+
+            bool jaEstaEmAndamento = await _conflitoService.VerificarDuplicidadeMedicamentoEmAndamentoAsync(
+                tratamentoAtual.PacienteId,
+                MedicamentoSelecionado.Id,
+                MedicamentoTratamentoId);
+
+            if (jaEstaEmAndamento)
+            {
+                await _dialogService.DisplayAlert(
+                    "Medicamento em Uso",
+                    $"O medicamento {MedicamentoSelecionado.NomeComercial} já possui um agendamento ativo e com doses pendentes para este paciente.",
+                    "OK");
+                return;
+            }
+
+            // 2. Monta uma lista temporária dos horários que serão criados
+            var novosHorarios = new List<DateTime>();
+            DateTime atual = DataInicio.Date.Add(HoraInicio);
+            DateTime fim = DataFim.Date.Add(HoraFim);
+
+            while (atual <= fim)
+            {
+                novosHorarios.Add(atual);
+                atual = atual.AddHours(IntervaloHoras);
+            }
+
+            // 3. Executa a checagem usando o serviço de conflito (Apenas valida novos registros)
+            if (MedicamentoTratamentoId == 0)
+            {
+                var conflitos = await _conflitoService.VerificarConflitosAsync(tratamentoAtual, novosHorarios);
+                if (conflitos.Any())
+                {
+                    bool prosseguir = await _dialogService.DisplayConfirmationAsync(
+                        "Aviso de Conflito",
+                        $"Atenção: Existem {conflitos.Count} doses mapeadas com menos de 30 minutos de diferença para outros medicamentos agendados deste mesmo paciente. Deseja manter esses horários mesmo assim?",
+                        "Sim",
+                        "Não");
+
+                    if (!prosseguir) return;
+                }
+            }
+
+            // 4. Efetivação dos dados no banco de dados
             if (MedicamentoTratamentoId == 0)
             {
                 // Salva um novo vínculo

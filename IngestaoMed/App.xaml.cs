@@ -27,11 +27,9 @@ public partial class App : Application
 
     private async Task WindowsInicialization()
     {
-        _configService.EhPrimeiroAcesso = true;
         if (_configService.EhPrimeiroAcesso)
-        {
-            // Estado 1: Usuário instalou agora. Mostra Slides.
-            await Shell.Current.GoToAsync("//ListaPacientesPage");//"//WelcomePage");
+        {            
+            await Shell.Current.GoToAsync("//WelcomePage");
         }
         else
         {
@@ -39,13 +37,11 @@ public partial class App : Application
 
             if (existeUsuario)
             {
-                // Estado 3: Usuário recorrente.
                 await Shell.Current.GoToAsync("//LoginPage");
             }
             else
             {
-                // Estado 2: Já viu os slides, mas não terminou o cadastro.
-                await Shell.Current.GoToAsync("//RegisterCuidadorPage");
+                await Shell.Current.GoToAsync("//CuidadorPage");
             }
         }
     }
