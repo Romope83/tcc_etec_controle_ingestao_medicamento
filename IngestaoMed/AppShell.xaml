@@ -59,7 +59,7 @@
         </Tab>
 
         <Tab Title="Tratamentos" Icon="home_icon.png">
-            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" Route="MainPage" />
+            <ShellContent ContentTemplate="{DataTemplate views:ListaTratamentosPage}" Route="ListaTratamentoPage" />
         </Tab>
     </TabBar>
 
