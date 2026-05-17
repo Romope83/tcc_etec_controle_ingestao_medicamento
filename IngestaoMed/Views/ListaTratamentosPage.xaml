@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.ListaTratamentosPage"
+             x:DataType="vm:ListaTratamentosViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="White">
+
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20">
+
+        <!-- ── Barra de pesquisa ── -->
+        <Border Grid.Row="0"
+                StrokeShape="RoundRectangle 25"
+                StrokeThickness="0"
+                BackgroundColor="White"
+                Padding="10,0"
+                HeightRequest="50"
+                Margin="0,10,0,12">
+            <Border.Shadow>
+                <Shadow Offset="0,2" Radius="5" Opacity="0.1" Brush="Black" />
+            </Border.Shadow>
+            <Grid ColumnDefinitions="Auto, *">
+                <Label Grid.Column="0"
+                       Text="🔍"
+                       VerticalOptions="Center"
+                       Margin="10,0" />
+                <Entry Grid.Column="1"
+                       Text="{Binding TextoBusca}"
+                       Placeholder="Pesquisar..."
+                       PlaceholderColor="Gray"
+                       VerticalOptions="Center"
+                       BackgroundColor="Transparent" />
+            </Grid>
+        </Border>
+
+        <!-- ── Lista de Tratamentos ── -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding TratamentosFiltrados}">
+
+            <CollectionView.EmptyView>
+                <Label Text="Nenhum tratamento encontrado"
+                       TextColor="Gray"
+                       FontSize="15"
+                       HorizontalOptions="Center"
+                       Margin="0,40,0,0" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Tratamento">
+                    <Grid ColumnDefinitions="*, Auto"
+                          Padding="4,0"
+                          Margin="0,0,0,2">
+
+                        <!-- Área clicável — navega para TratamentoPage -->
+                        <VerticalStackLayout Grid.Column="0"
+                                            Padding="0,14"
+                                            Spacing="3">
+                            <VerticalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaTratamentosViewModel}}, Path=SelecionarTratamentoCommand}"
+                                    CommandParameter="{Binding Id}" />
+                            </VerticalStackLayout.GestureRecognizers>
+
+                            <!-- Nome -->
+                            <Label Text="{Binding Nome}"
+                                   FontSize="16"
+                                   TextColor="Black" />
+
+                            <!-- Início e Fim -->
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{Binding DataInicio, StringFormat='Início: {0:dd/MM/yyyy}'}"
+                                       FontSize="12"
+                                       TextColor="Gray" />
+                                <Label Text="·" TextColor="LightGray" FontSize="12" VerticalOptions="Center" />
+                                <Label FontSize="12" TextColor="Gray">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label"
+                                                     Binding="{Binding DataFim}"
+                                                     Value="{x:Null}">
+                                            <Setter Property="Text" Value="Fim: Contínuo" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                    <Label.Text>
+                                        <Binding Path="DataFim" StringFormat="Fim: {0:dd/MM/yyyy}" />
+                                    </Label.Text>
+                                </Label>
+                            </HorizontalStackLayout>
+
+                            <!-- Ativo / Inativo -->
+                            <Label FontSize="12" FontAttributes="Bold">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding Ativo}" Value="True">
+                                        <Setter Property="Text" Value="● Ativo" />
+                                        <Setter Property="TextColor" Value="#2E7D32" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding Ativo}" Value="False">
+                                        <Setter Property="Text" Value="● Inativo" />
+                                        <Setter Property="TextColor" Value="#B71C1C" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+
+                        </VerticalStackLayout>
+
+                        <!-- Ícone lixo -->
+                        <Button Grid.Column="1"
+                                Text="🗑️"
+                                FontSize="18"
+                                BackgroundColor="Transparent"
+                                WidthRequest="44"
+                                HeightRequest="44"
+                                Padding="0"
+                                VerticalOptions="Center"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaTratamentosViewModel}}, Path=RemoverTratamentoCommand}"
+                                CommandParameter="{Binding .}" />
+
+                        <!-- Linha separadora -->
+                        <BoxView Grid.Column="0"
+                                 Grid.ColumnSpan="2"
+                                 HeightRequest="1"
+                                 BackgroundColor="#F0F0F0"
+                                 VerticalOptions="End" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- ── Botão Novo Tratamento ── -->
+        <Button Grid.Row="2"
+                Text="+ Novo Tratamento"
+                Command="{Binding NovoTratamentoCommand}"
+                BackgroundColor="{StaticResource Primary}"
+                TextColor="White"
+                CornerRadius="25"
+                HeightRequest="50"
+                Margin="0,10,0,0" />
+
+    </Grid>
+</ContentPage>
