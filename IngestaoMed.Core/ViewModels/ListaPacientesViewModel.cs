@@ -61,16 +61,6 @@ namespace IngestaoMed.Core.ViewModels
         }
 
         [RelayCommand]
-        private async Task RemoverPacienteAsync(Paciente paciente)
-        {
-            if (await _dialog.DisplayConfirmationAsync("Excluir", $"Remover {paciente.Nome}?", "Sim", "Não"))
-            {
-                if (await _service.RemoverPacienteAsync(paciente))
-                    Pacientes.Remove(paciente);
-            }
-        }
-
-        [RelayCommand]
         private async Task SelecionarPacienteAsync(int pacienteId)
         {
             if (pacienteId <= 0) return;

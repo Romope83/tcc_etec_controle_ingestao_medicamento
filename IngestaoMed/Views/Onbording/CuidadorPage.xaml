@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.Onboarding.CuidadorPage"
+             x:DataType="vm:CuidadorViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.FlyoutBehavior="Disabled"
+             BackgroundColor="White">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="25" Padding="30">
+
+            <Label Text="Cadastro do Cuidador" 
+                   FontSize="18" 
+                   FontAttributes="Bold" 
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center" 
+                   Margin="0,10,0,5"/>
+
+
+
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Nome do Cuidador" FontSize="14" TextColor="{StaticResource Primary}" />
+                <Entry Text="{Binding NomeCuidador}" 
+                       Placeholder="Digite seu nome completo" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Telefone" FontSize="14" TextColor="{StaticResource Primary}" />
+                <Entry Text="{Binding TelefoneCuidador}"
+                       Keyboard="Telephone" 
+                       Placeholder="(00) 00000-0000">
+                    <Entry.Behaviors>
+                        <toolkit:MaskedBehavior x:Name="MascaraTelefone"
+                                                Mask="(XX) XXXXX-XXXX" 
+                                                UnmaskedCharacter="X" />
+                    </Entry.Behaviors>
+                </Entry>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Email" FontSize="14" TextColor="{StaticResource Primary}" />
+                <Entry Text="{Binding EmailCuidador}" 
+                       Keyboard="Email" 
+                       Placeholder="email@exemplo.com" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Senha" FontSize="14" TextColor="{StaticResource Primary}" />
+                <Entry Text="{Binding SenhaCuidador}" 
+                       IsPassword="True" 
+                       Placeholder="Crie uma senha de acesso" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Confirmar Senha" FontSize="14" TextColor="{StaticResource Primary}" />
+                <Entry Text="{Binding ConfirmacaoSenhaCuidador}" 
+                       IsPassword="True" 
+                       Placeholder="Digite a senha novamente" />
+            </VerticalStackLayout>
+
+            <Button Text="CONCLUIR CADASTRO" 
+                    Command="{Binding SalvarCuidadorCommand}" 
+                    BackgroundColor="{StaticResource Primary}" 
+                    TextColor="White"
+                    CornerRadius="25"
+                    HeightRequest="55"
+                    WidthRequest="260"
+                    HorizontalOptions="Center"
+                    Margin="0,25,0,0"
+                    FontAttributes="Bold"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

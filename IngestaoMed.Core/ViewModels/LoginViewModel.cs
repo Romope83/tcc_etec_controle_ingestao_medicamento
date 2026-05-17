@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Services;
+using System.Threading.Tasks;
 
 namespace IngestaoMed.Core.ViewModels
 {
@@ -11,17 +12,42 @@ namespace IngestaoMed.Core.ViewModels
         private readonly IDialogService _dialogService;
         private readonly INavigationService _navigationService;
 
-        [ObservableProperty]
-        private string email = string.Empty;
+        [ObservableProperty] private string email = string.Empty;
+        [ObservableProperty] private string senha = string.Empty;
 
-        [ObservableProperty]
-        private string senha = string.Empty;
+        // Propriedades que gerenciam o estado visual da tela alternada
+        [ObservableProperty] private bool exibirCamposLogin = false;
+        [ObservableProperty] private bool exibirOpcoesPerfil = true;
 
         public LoginViewModel(IAuthService authService, IDialogService dialogService, INavigationService navigationService)
         {
             _authService = authService;
             _dialogService = dialogService;
             _navigationService = navigationService;
+        }
+
+        [RelayCommand]
+        private async Task NavegarParaPaciente()
+        {
+            await _navigationService.GoToAsync("paciente/PacientesPage");
+        }
+
+        [RelayCommand]
+        private void MostrarLoginCuidador()
+        {
+            ExibirOpcoesPerfil = false;
+            ExibirCamposLogin = true;
+        }
+
+        [RelayCommand]
+        private void VoltarParaPerfil()
+        {
+            // Limpa os campos preenchidos por segurança ao alternar
+            Email = string.Empty;
+            Senha = string.Empty;
+
+            ExibirCamposLogin = false;
+            ExibirOpcoesPerfil = true;
         }
 
         [RelayCommand]
@@ -37,7 +63,7 @@ namespace IngestaoMed.Core.ViewModels
 
             if (sucesso)
             {
-                await _navigationService.GoToAsync("//CadastroMedPage");
+                await _navigationService.GoToAsync("ListaPacientesPage");
             }
             else
             {

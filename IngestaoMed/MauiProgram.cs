@@ -64,6 +64,7 @@ namespace IngestaoMed
             builder.Services.AddScoped<IEmailService, MailKitService>();
             builder.Services.AddSingleton<IFileStorageService, FileSystemService>();
             builder.Services.AddSingleton<IConfigService, ConfigService>();
+            builder.Services.AddSingleton<IAgendamentoConflitoService, AgendamentoConflitoService>();
             // Define o caminho do arquivo .db3
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "IngestaoMed.db3");
             System.Diagnostics.Debug.Write(dbPath);
@@ -83,6 +84,7 @@ namespace IngestaoMed
             builder.Services.AddScoped<IEmailOutboxProcessor, EmailOutboxProcessor>();
             builder.Services.AddScoped<IMediaManagerService, MediaManagerService>(); 
             builder.Services.AddScoped<ITratamentoService, TratamentoService>();
+            builder.Services.AddScoped<ICuidadorService, CuidadorService>();
             // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
 
             // Registre as ViewModels
@@ -96,7 +98,7 @@ namespace IngestaoMed
             builder.Services.AddTransient<WelcomeViewModel>();
             builder.Services.AddTransient<TratamentoViewModel>();
             builder.Services.AddTransient<PacienteDetalhesViewModel>();
-            //builder.Services.AddTransient<EdicaoTratamentoViewModel>();
+            builder.Services.AddTransient<CuidadorViewModel>();
             builder.Services.AddTransient<AgendamentoViewModel>();
 
             //builder.Services.AddTransient<RegisterCuidadorViewModel>();
@@ -108,7 +110,7 @@ namespace IngestaoMed
             builder.Services.AddTransient<ListaPacientesPage>();
             builder.Services.AddTransient<PacientePage>();
             builder.Services.AddTransient<WelcomePage>();
-            builder.Services.AddTransient<RegisterCuidadorPage>();
+            builder.Services.AddTransient<CuidadorPage>();
             builder.Services.AddTransient<PacienteDetalhesPage>();
             // STARTUP
             builder.Services.AddSingleton<AppShell>();

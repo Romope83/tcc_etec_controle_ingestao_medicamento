@@ -1,89 +1,155 @@
-﻿using Moq;
-using Xunit;
-using IngestaoMed.Core.ViewModels;
-using IngestaoMed.Core.Services;
-using IngestaoMed.Core.Interfaces;
+﻿using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
+using IngestaoMed.Core.Services;
+using IngestaoMed.Core.ViewModels;
+using Moq;
+using System;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace IngestaoMed.Tests.ViewModels
 {
     public class CadastroViewModelTests
     {
-        private readonly Mock<IAuthService> _authMock;
-        private readonly Mock<IDialogService> _dialogMock;
+        private readonly Mock<IAuthService> _authServiceMock;
+        private readonly Mock<IDialogService> _dialogServiceMock;
+        private readonly Mock<IConfigService> _configServiceMock;
+        private readonly Mock<INavigationService> _navigationServiceMock;
         private readonly CadastroViewModel _viewModel;
-        private readonly Mock<IConfigService> _configMock;
-        private readonly Mock<INavigationService> _navigationMock;
 
         public CadastroViewModelTests()
         {
-            // Instanciação dos Mocks para as novas dependências
-            _authMock = new Mock<IAuthService>();
-            _dialogMock = new Mock<IDialogService>();
-            _configMock = new Mock<IConfigService>();
-            _navigationMock = new Mock<INavigationService>();
+            _authServiceMock = new Mock<IAuthService>();
+            _dialogServiceMock = new Mock<IDialogService>();
+            _configServiceMock = new Mock<IConfigService>();
+            _navigationServiceMock = new Mock<INavigationService>();
 
-            // Injeção de todos os mocks no construtor da ViewModel
             _viewModel = new CadastroViewModel(
-                _authMock.Object,
-                _dialogMock.Object,
-                _configMock.Object,
-                _navigationMock.Object);
+                _authServiceMock.Object,
+                _dialogServiceMock.Object,
+                _configServiceMock.Object,
+                _navigationServiceMock.Object);
         }
 
-        [Fact]
-        public async Task SalvarCadastro_DeveExibirErro_QuandoCamposEstaoVazios()
+        [Theory]
+        [InlineData("", "cuidador@email.com", "123456")]
+        [InlineData("Nome Cuidador", "", "123456")]
+        [InlineData("Nome Cuidador", "cuidador@email.com", "")]
+        public async Task SalvarCadastro_CamposObrigatoriosVazios_DeveExibirAlertaEInterromper(string nome, string email, string senha)
         {
             // Arrange
-            _viewModel.Nome = "";
-            _viewModel.Email = "";
-            _viewModel.Senha = ""; // Lembre-se que a senha também é obrigatória agora
+            _viewModel.Nome = nome;
+            _viewModel.Email = email;
+            _viewModel.Senha = senha;
 
             // Act
             await _viewModel.SalvarCadastroCommand.ExecuteAsync(null);
 
-            // Assert - O título deve bater exatamente com o da ViewModel
-            _dialogMock.Verify(d => d.DisplayAlert(
-                "Campos Obrigatórios",
-                "Por favor, preencha nome, e-mail e senha.",
-                "OK"), Times.Once);
+            // Assert
+            _dialogServiceMock.Verify(d => d.DisplayAlert("Campos Obrigatórios", "Por favor, preencha nome, e-mail e senha.", "OK"), Times.Once);
+            _authServiceMock.Verify(a => a.RegistrarCuidador(It.IsAny<Cuidador>(), It.IsAny<string>()), Times.Never);
         }
 
         [Theory]
         [InlineData("emailinvalido")]
-        [InlineData("usuario@")]
-        [InlineData("@dominio.com")]
-        public async Task SalvarCadastro_DeveExibirErro_QuandoEmailForInvalido(string emailIncorreto)
+        [InlineData("email@")]
+        [InlineData("email@dominio")]
+        public async Task SalvarCadastro_FormatoEmailInvalido_DeveExibirAlertaEInterromper(string emailInvalido)
         {
             // Arrange
-            _viewModel.Nome = "Teste";
-            _viewModel.Email = emailIncorreto;
+            _viewModel.Nome = "Ronaldo";
+            _viewModel.Email = emailInvalido;
             _viewModel.Senha = "123456";
 
             // Act
             await _viewModel.SalvarCadastroCommand.ExecuteAsync(null);
 
             // Assert
-            _dialogMock.Verify(d => d.DisplayAlert("E-mail Inválido", It.IsAny<string>(), "OK"), Times.Once);
+            _dialogServiceMock.Verify(d => d.DisplayAlert("E-mail Inválido", "Por favor, insira um endereço de e-mail válido.", "OK"), Times.Once);
+            _authServiceMock.Verify(a => a.RegistrarCuidador(It.IsAny<Cuidador>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task SalvarCadastro_DeveExibirSucesso_QuandoDadosForemValidos()
+        public async Task SalvarCadastro_SenhaCurta_DeveExibirAlertaEInterromper()
         {
             // Arrange
-            _viewModel.Nome = "João Silva";
-            _viewModel.Email = "joao@email.com";
-            _viewModel.Senha = "Senha@123";
-
-            // Simula que o e-mail não existe no banco e o registro funciona
-            _authMock.Setup(a => a.ValidarEmail(It.IsAny<string>())).ReturnsAsync(false);
-            _authMock.Setup(a => a.RegistrarCuidador(It.IsAny<Cuidador>(), It.IsAny<string>())).ReturnsAsync(true);
+            _viewModel.Nome = "Ronaldo";
+            _viewModel.Email = "ronaldo@email.com";
+            _viewModel.Senha = "12345";
 
             // Act
             await _viewModel.SalvarCadastroCommand.ExecuteAsync(null);
 
             // Assert
-            _dialogMock.Verify(d => d.DisplayAlert("Sucesso", It.IsAny<string>(), "OK"), Times.Once);
+            _dialogServiceMock.Verify(d => d.DisplayAlert("Senha Curta", "A senha deve conter no mínimo 6 caracteres para sua segurança.", "OK"), Times.Once);
+            _authServiceMock.Verify(a => a.RegistrarCuidador(It.IsAny<Cuidador>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task SalvarCadastro_EmailJaExisteNoBanco_DeveExibirAlertaEInterromper()
+        {
+            // Arrange
+            _viewModel.Nome = "Ronaldo";
+            _viewModel.Email = "ronaldo@email.com";
+            _viewModel.Senha = "123456";
+
+            _authServiceMock.Setup(a => a.ValidarEmail(_viewModel.Email)).ReturnsAsync(true);
+
+            // Act
+            await _viewModel.SalvarCadastroCommand.ExecuteAsync(null);
+
+            // Assert
+            _dialogServiceMock.Verify(d => d.DisplayAlert("E-mail em uso", "Este e-mail já está cadastrado. Tente recuperar sua senha ou use outro e-mail.", "OK"), Times.Once);
+            _authServiceMock.Verify(a => a.RegistrarCuidador(It.IsAny<Cuidador>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task SalvarCadastro_FalhaNoServicoDeRegistro_DeveExibirMensagemDeErro()
+        {
+            // Arrange
+            _viewModel.Nome = "Ronaldo";
+            _viewModel.Email = "ronaldo@email.com";
+            _viewModel.Senha = "123456";
+            _viewModel.Telefone = "11999999999";
+
+            _authServiceMock.Setup(a => a.ValidarEmail(_viewModel.Email)).ReturnsAsync(false);
+            _authServiceMock.Setup(a => a.RegistrarCuidador(It.IsAny<Cuidador>(), _viewModel.Senha)).ReturnsAsync(false);
+
+            // Act
+            await _viewModel.SalvarCadastroCommand.ExecuteAsync(null);
+
+            // Assert
+            _dialogServiceMock.Verify(d => d.DisplayAlert("Erro", "Não foi possível realizar o cadastro. Tente novamente mais tarde.", "OK"), Times.Once);
+            _navigationServiceMock.Verify(n => n.GoToAsync(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task SalvarCadastro_Sucesso_DeveAtualizarConfiguracoesExibirAlertaENavegar()
+        {
+            // Arrange
+            _viewModel.Nome = "Ronaldo";
+            _viewModel.Email = "ronaldo@email.com";
+            _viewModel.Senha = "123456";
+            _viewModel.Telefone = "11999999999";
+
+            _authServiceMock.Setup(a => a.ValidarEmail(_viewModel.Email)).ReturnsAsync(false);
+            _authServiceMock.Setup(a => a.RegistrarCuidador(It.IsAny<Cuidador>(), _viewModel.Senha)).ReturnsAsync(true);
+
+            // Act
+            await _viewModel.SalvarCadastroCommand.ExecuteAsync(null);
+
+            // Assert
+            _authServiceMock.Verify(a => a.RegistrarCuidador(It.Is<Cuidador>(c =>
+                c.Nome == "Ronaldo" &&
+                c.Email == "ronaldo@email.com" &&
+                c.Telefone == "11999999999"
+            ), _viewModel.Senha), Times.Once);
+
+            _configServiceMock.VerifySet(c => c.EhPrimeiroAcesso = false, Times.Once);
+            _configServiceMock.VerifySet(c => c.EmailCuidadorConfigurado = "ronaldo@email.com", Times.Once);
+
+            _dialogServiceMock.Verify(d => d.DisplayAlert("Sucesso", "Perfil configurado com sucesso!", "OK"), Times.Once);
+            _navigationServiceMock.Verify(n => n.GoToAsync("//ListaPacientePage"), Times.Once);
         }
     }
 }
