@@ -93,6 +93,9 @@
 	  <Compile Update="Views\CadastroMedPage.xaml.cs">
 	    <DependentUpon>CadastroMedPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\ListaTratamentosPage.xaml.cs">
+	    <DependentUpon>ListaTratamentosPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\PacientePage.xaml.cs">
 	    <DependentUpon>PacientePage.xaml</DependentUpon>
 	  </Compile>
@@ -112,6 +115,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\CadastroMedPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\ListaTratamentosPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\PacientePage.xaml">

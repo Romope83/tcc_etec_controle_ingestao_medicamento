@@ -17,7 +17,7 @@
                    Margin="0,0,0,10">
                 <Label.Triggers>
                     <DataTrigger TargetType="Label" Binding="{Binding TratamentoId}" Value="0">
-                        <Setter Property="Text" Value="Tratamento Novo" />
+                        <Setter Property="Text" Value="Tratamento Novo"/>
                     </DataTrigger>
                 </Label.Triggers>
             </Label>

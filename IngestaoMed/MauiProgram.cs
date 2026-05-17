@@ -86,6 +86,8 @@ namespace IngestaoMed
             // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
 
             // Registre as ViewModels
+            builder.Services.AddTransient<ListaMedicamentosViewModel>();
+            builder.Services.AddTransient<ListaTratamentosViewModel>();
             builder.Services.AddTransient<CadastroViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<CadastroMedicamentoViewModel>();
@@ -101,6 +103,8 @@ namespace IngestaoMed
 
             //builder.Services.AddTransient<RegisterCuidadorViewModel>();
             // Registre as Pages
+            builder.Services.AddTransient<ListaMedicamentosPage>();
+            builder.Services.AddTransient<ListaTratamentosPage>();
             builder.Services.AddTransient<CadastroPage>();
             builder.Services.AddTransient<CadastroMedicamentoPage>();
             builder.Services.AddTransient<ListaMedicamentosPage>();

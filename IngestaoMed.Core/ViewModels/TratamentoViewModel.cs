@@ -194,6 +194,14 @@ namespace IngestaoMed.Core.ViewModels
         }
 
         [RelayCommand]
+        private async Task SelecionarMedicamentoVinculadoAsync(MedicamentoTratamento medicamento)
+        {
+            if (medicamento == null) return;
+            await _navigation.GoToAsync($"AgendamentoPage?medicamentoTratamentoId={medicamento.Id}");
+        }
+
+
+        [RelayCommand]
         private async Task ExcluirTratamentoAsync()
         {
             if (TratamentoId <= 0) return;
@@ -203,6 +211,7 @@ namespace IngestaoMed.Core.ViewModels
                 "Tem certeza que deseja excluir este tratamento e todos os seus agendamentos?",
                 "Sim",
                 "Não");
+
 
             if (!confirmar) return;
 

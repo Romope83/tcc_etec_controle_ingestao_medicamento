@@ -65,5 +65,12 @@ namespace IngestaoMed.Core.Services
         {
             return await _db.ExcluirAsync(vinculo);
         }
+
+        public async Task<List<Tratamento>> ObterTodosAsync()
+        {
+            return await _db.BuscarTodosAsync<Tratamento>();
+        }
+
+
     }
 }

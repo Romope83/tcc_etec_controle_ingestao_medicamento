@@ -13,7 +13,7 @@ namespace IngestaoMed.Core.Interfaces
         Task<int> InserirTratamentoAsync(Tratamento tratamento);
         Task<int> AtualizarTratamentoAsync(Tratamento tratamento);
         Task<int> ExcluirTratamentoAsync(Tratamento tratamento);
-
+        Task<List<Tratamento>> ObterTodosAsync();
         Task<int> ExcluirMedicamentoTratamentoAsync(MedicamentoTratamento vinculo);
     }
 }

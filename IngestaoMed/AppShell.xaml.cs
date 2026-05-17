@@ -16,6 +16,7 @@ namespace IngestaoMed
             Routing.RegisterRoute(nameof(TratamentoPage), typeof(TratamentoPage));
             Routing.RegisterRoute(nameof(AgendamentoPage), typeof(AgendamentoPage));
             Routing.RegisterRoute(nameof(PacientePage), typeof(PacientePage));
+            Routing.RegisterRoute(nameof(ListaTratamentosPage), typeof(ListaTratamentosPage));
 
         }
     }
