@@ -1,7 +1,10 @@
 ﻿using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
-using IngestaoMed.Interfaces; // Namespace onde está o INotificationMapper
+using IngestaoMed.Interfaces;
 using Plugin.LocalNotification;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IngestaoMed.Services
 {
@@ -16,9 +19,7 @@ namespace IngestaoMed.Services
 
         public async Task AgendarNotificacaoAsync(Agendamento agendamento)
         {
-            // O Mapper cuida da tradução do seu objeto de domínio para o plugin
             var request = _mapper.MapToRequest(agendamento);
-
             if (request != null)
             {
                 await LocalNotificationCenter.Current.Show(request);
@@ -27,9 +28,31 @@ namespace IngestaoMed.Services
 
         public async Task CancelarAlarmeAsync(int agendamentoId)
         {
-            // Cancela a notificação pendente no sistema operacional
             LocalNotificationCenter.Current.Cancel(agendamentoId);
             await Task.CompletedTask;
+        }
+
+        public async Task SincronizarJanelaAlarmesAsync(List<Agendamento> proximosAlarmes)
+        {
+            try
+            {
+                // Limpa o lixo de notificações antigas no SO
+                LocalNotificationCenter.Current.CancelAll();
+
+                // Agenda estritamente o lote enviado pelo Core
+                foreach (var dose in proximosAlarmes)
+                {
+                    var request = _mapper.MapToRequest(dose);
+                    if (request != null)
+                    {
+                        await LocalNotificationCenter.Current.Show(request);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro ao atualizar SO: {ex.Message}");
+            }
         }
     }
 }

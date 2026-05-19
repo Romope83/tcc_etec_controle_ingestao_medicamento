@@ -66,6 +66,7 @@ namespace IngestaoMed
             builder.Services.AddSingleton<IFileStorageService, FileSystemService>();
             builder.Services.AddSingleton<IConfigService, ConfigService>();
             builder.Services.AddSingleton<IAgendamentoConflitoService, AgendamentoConflitoService>();
+            builder.Services.AddSingleton<IAgendamentoService, AgendamentoService>();
             // Define o caminho do arquivo .db3
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "IngestaoMed.db3");
             System.Diagnostics.Debug.Write(dbPath);

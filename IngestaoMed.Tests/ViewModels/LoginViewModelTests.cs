@@ -1,116 +1,155 @@
-﻿using Moq;
-using Xunit;
-using IngestaoMed.Core.ViewModels;
+﻿using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Services;
-using IngestaoMed.Core.Interfaces;
+using IngestaoMed.Core.ViewModels;
+using Moq;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace IngestaoMed.Tests.ViewModels
 {
     public class LoginViewModelTests
     {
-        private readonly Mock<IAuthService> _authMock;
-        private readonly Mock<IDialogService> _dialogMock;
-        private readonly Mock<INavigationService> _navigationMock;
+        private readonly Mock<IAuthService> _authServiceMock;
+        private readonly Mock<IDialogService> _dialogServiceMock;
+        private readonly Mock<INavigationService> _navigationServiceMock;
         private readonly LoginViewModel _viewModel;
 
         public LoginViewModelTests()
         {
-            _authMock = new Mock<IAuthService>();
-            _dialogMock = new Mock<IDialogService>();
-            _navigationMock = new Mock<INavigationService>();
-            _viewModel = new LoginViewModel(_authMock.Object, _dialogMock.Object, _navigationMock.Object);
+            _authServiceMock = new Mock<IAuthService>();
+            _dialogServiceMock = new Mock<IDialogService>();
+            _navigationServiceMock = new Mock<INavigationService>();
+
+            _viewModel = new LoginViewModel(
+                _authServiceMock.Object,
+                _dialogServiceMock.Object,
+                _navigationServiceMock.Object);
         }
 
+        #region Construtor
+
         [Fact]
-        public async Task Entrar_DeveNavegarParaMainPage_QuandoLoginForSucesso()
+        public void Construtor_DeveInicializarComEstadoVisualPadrao()
+        {
+            // Arrange & Act
+
+            // Assert
+            Assert.Empty(_viewModel.Email);
+            Assert.Empty(_viewModel.Senha);
+            Assert.False(_viewModel.ExibirCamposLogin);
+            Assert.True(_viewModel.ExibirOpcoesPerfil);
+        }
+
+        #endregion
+
+        #region NavegarParaPacienteAsync
+
+        [Fact]
+        public async Task NavegarParaPacienteCommand_Sempre_DeveNavegarParaPaginaPacientes()
+        {
+            // Arrange & Act
+            await _viewModel.NavegarParaPacienteCommand.ExecuteAsync(null);
+
+            // Assert
+            _navigationServiceMock.Verify(n => n.GoToAsync("PacientesPage"), Times.Once);
+        }
+
+        #endregion
+
+        #region MostrarLoginCuidador
+
+        [Fact]
+        public void MostrarLoginCuidadorCommand_Sempre_DeveAlternarEstadosVisuais()
         {
             // Arrange
-            _viewModel.Email = "admin@teste.com";
+            _viewModel.ExibirOpcoesPerfil = true;
+            _viewModel.ExibirCamposLogin = false;
+
+            // Act
+            _viewModel.MostrarLoginCuidadorCommand.Execute(null);
+
+            // Assert
+            Assert.False(_viewModel.ExibirOpcoesPerfil);
+            Assert.True(_viewModel.ExibirCamposLogin);
+        }
+
+        #endregion
+
+        #region VoltarParaPerfil
+
+        [Fact]
+        public void VoltarParaPerfilCommand_Sempre_DeveLimparCamposERetornarEstadoVisual()
+        {
+            // Arrange
+            _viewModel.Email = "cuidador@teste.com";
             _viewModel.Senha = "123456";
-
-            _authMock.Setup(a => a.ValidarLogin(_viewModel.Email, _viewModel.Senha))
-                     .ReturnsAsync(true);
+            _viewModel.ExibirOpcoesPerfil = false;
+            _viewModel.ExibirCamposLogin = true;
 
             // Act
-            await _viewModel.EntrarCommand.ExecuteAsync(null);
+            _viewModel.VoltarParaPerfilCommand.Execute(null);
 
             // Assert
-            // Verifica se o método de navegação foi chamado com a rota correta
-            _navigationMock.Verify(n => n.GoToAsync("//ListaPacientePage"), Times.Once);
-
-            // Garante que nenhum alerta de erro foi exibido
-            _dialogMock.Verify(d => d.DisplayAlert(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            Assert.Empty(_viewModel.Email);
+            Assert.Empty(_viewModel.Senha);
+            Assert.True(_viewModel.ExibirOpcoesPerfil);
+            Assert.False(_viewModel.ExibirCamposLogin);
         }
 
-        [Fact]
-        public async Task Entrar_NaoDeveNavegar_QuandoLoginFalhar()
+        #endregion
+
+        #region EntrarAsync
+
+        [Theory]
+        [InlineData("", "123")]
+        [InlineData("cuidador@teste.com", "")]
+        [InlineData(" ", " ")]
+        public async Task EntrarCommand_CamposVaziosOuNulos_DeveExibirAlertaEInterromper(string email, string senha)
         {
             // Arrange
-            _viewModel.Email = "usuario@invalido.com";
-            _viewModel.Senha = "000";
-
-            _authMock.Setup(a => a.ValidarLogin(It.IsAny<string>(), It.IsAny<string>()))
-                     .ReturnsAsync(false);
+            _viewModel.Email = email;
+            _viewModel.Senha = senha;
 
             // Act
             await _viewModel.EntrarCommand.ExecuteAsync(null);
 
             // Assert
-            _navigationMock.Verify(n => n.GoToAsync(It.IsAny<string>()), Times.Never);
-
-            _dialogMock.Verify(d => d.DisplayAlert("Erro", "E-mail ou senha inválidos.", "OK"), Times.Once);
+            _dialogServiceMock.Verify(d => d.DisplayAlert("Erro", "Preencha todos os campos.", "OK"), Times.Once);
+            _authServiceMock.Verify(a => a.ValidarLogin(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task Entrar_DeveExibirErro_QuandoCamposEstaoVazios()
+        public async Task EntrarCommand_LoginComSucesso_DeveNavegarParaListaPacientes()
         {
             // Arrange
-            _viewModel.Email = "";
-            _viewModel.Senha = "";
+            _viewModel.Email = "cuidador@teste.com";
+            _viewModel.Senha = "senha123";
+            _authServiceMock.Setup(a => a.ValidarLogin("cuidador@teste.com", "senha123")).ReturnsAsync(true);
 
             // Act
             await _viewModel.EntrarCommand.ExecuteAsync(null);
 
             // Assert
-            _dialogMock.Verify(d => d.DisplayAlert("Erro", "Preencha todos os campos.", "OK"), Times.Once);
-            _authMock.Verify(a => a.ValidarLogin(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _navigationServiceMock.Verify(n => n.GoToAsync("//ListaPacientesPage"), Times.Once);
+            _dialogServiceMock.Verify(d => d.DisplayAlert(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task Entrar_DeveExibirErro_QuandoCredenciaisSaoInvalidas()
+        public async Task EntrarCommand_LoginInvalido_DeveExibirAlertaDeErro()
         {
             // Arrange
             _viewModel.Email = "errado@teste.com";
-            _viewModel.Senha = "123";
-
-            _authMock.Setup(a => a.ValidarLogin(_viewModel.Email, _viewModel.Senha))
-                     .ReturnsAsync(false);
+            _viewModel.Senha = "senhaIncorreta";
+            _authServiceMock.Setup(a => a.ValidarLogin("errado@teste.com", "senhaIncorreta")).ReturnsAsync(false);
 
             // Act
             await _viewModel.EntrarCommand.ExecuteAsync(null);
 
             // Assert
-            _dialogMock.Verify(d => d.DisplayAlert("Erro", "E-mail ou senha inválidos.", "OK"), Times.Once);
+            _dialogServiceMock.Verify(d => d.DisplayAlert("Erro", "E-mail ou senha inválidos.", "OK"), Times.Once);
+            _navigationServiceMock.Verify(n => n.GoToAsync(It.IsAny<string>()), Times.Never);
         }
 
-        [Fact]
-        public async Task Entrar_DeveChamarValidarLogin_ComDadosCorretos()
-        {
-            // Arrange
-            string emailTeste = "usuario@teste.com";
-            string senhaTeste = "Senha123";
-
-            _viewModel.Email = emailTeste;
-            _viewModel.Senha = senhaTeste;
-
-            _authMock.Setup(a => a.ValidarLogin(emailTeste, senhaTeste))
-                     .ReturnsAsync(true);
-
-            // Act
-            await _viewModel.EntrarCommand.ExecuteAsync(null);
-
-            // Assert
-            _authMock.Verify(a => a.ValidarLogin(emailTeste, senhaTeste), Times.Once);
-        }
+        #endregion
     }
 }

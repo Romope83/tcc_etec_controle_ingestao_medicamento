@@ -29,7 +29,7 @@ namespace IngestaoMed.Core.ViewModels
         [RelayCommand]
         private async Task NavegarParaPaciente()
         {
-            await _navigationService.GoToAsync("paciente/PacientesPage");
+            await _navigationService.GoToAsync("PacientesPage");
         }
 
         [RelayCommand]
@@ -63,7 +63,7 @@ namespace IngestaoMed.Core.ViewModels
 
             if (sucesso)
             {
-                await _navigationService.GoToAsync("ListaPacientesPage");
+                await _navigationService.GoToAsync("//ListaPacientesPage");
             }
             else
             {

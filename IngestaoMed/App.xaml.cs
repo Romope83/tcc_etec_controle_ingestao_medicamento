@@ -3,6 +3,7 @@ using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Services;
 
 namespace IngestaoMed;
+using Plugin.LocalNotification;
 
 public partial class App : Application
 {
@@ -16,6 +17,13 @@ public partial class App : Application
         _authService = authService;
         _shell = shell;
         _configService = configService;
+
+#if WINDOWS
+            LocalNotificationCenter.Current.RegisterCategoryList(new HashSet<NotificationCategory>
+            {
+                new NotificationCategory(NotificationCategoryType.Alarm)
+            });
+#endif
     }
 
 
@@ -41,7 +49,7 @@ public partial class App : Application
             }
             else
             {
-                await Shell.Current.GoToAsync("//CuidadorPage");
+                await Shell.Current.GoToAsync("CuidadorPage");
             }
         }
     }
@@ -50,4 +58,5 @@ public partial class App : Application
     {
         return new Window(_shell);
     }
+
 }

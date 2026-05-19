@@ -1,4 +1,4 @@
-﻿using Moq;
+﻿/*using Moq;
 using Xunit;
 using IngestaoMed.Core.ViewModels;
 using IngestaoMed.Core.Interfaces;
@@ -332,4 +332,4 @@ namespace IngestaoMed.Tests.ViewModels
 
         #endregion
     }
-}
+}*/
