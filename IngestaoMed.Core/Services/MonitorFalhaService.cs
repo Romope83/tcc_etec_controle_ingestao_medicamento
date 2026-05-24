@@ -20,20 +20,16 @@ namespace IngestaoMed.Core.Services
 
             if (totalSonecas >= config.LimiteSonecasParaAlerta)
             {
-                // 1. Busca o agendamento específico
                 var agendamento = await _db.BuscarPrimeiroAsync<Agendamento>(a => a.Id == agendamentoId);
                 if (agendamento == null) return;
 
-                // 2. Busca o vínculo do medicamento dentro do tratamento
                 var vinculo = await _db.BuscarPrimeiroAsync<MedicamentoTratamento>(m => m.Id == agendamento.MedicamentoTratamentoId);
                 if (vinculo == null) return;
 
-                // 3. Busca o nome comercial na tabela de Medicamentos
                 var medicamento = await _db.BuscarPrimeiroAsync<Medicamento>(m => m.Id == vinculo.MedicamentoId);
 
                 string nomeRemedio = medicamento?.NomeComercial ?? "Medicamento não identificado";
 
-                // 4. Monta o e-mail focado no remédio específico
                 var emailParaFila = new EmailFila
                 {
                     Destinatario = config.EmailCuidador,

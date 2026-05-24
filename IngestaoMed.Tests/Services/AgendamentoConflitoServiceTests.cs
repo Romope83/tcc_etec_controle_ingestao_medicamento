@@ -12,7 +12,6 @@ using System.Linq;
 using System;
 
 
-//Modificado em 16.05.2026
 namespace IngestaoMed.Tests.Services
 {
     public class AgendamentoConflitoServiceTests

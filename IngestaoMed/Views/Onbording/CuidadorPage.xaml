@@ -9,69 +9,93 @@
              Shell.FlyoutBehavior="Disabled"
              BackgroundColor="White">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="25" Padding="30">
+    <Grid RowDefinitions="Auto,*">
 
-            <Label Text="Cadastro do Cuidador" 
+        <Grid Grid.Row="0" 
+              ColumnDefinitions="Auto,*,Auto" 
+              Padding="20,15,20,0" 
+              VerticalOptions="Center">
+
+            <ImageButton Grid.Column="0"                         
+                         Source="dona_maria.png" 
+                         Command="{Binding VoltarCommand}"
+                         
+                         HeightRequest="30"
+                         WidthRequest="30"
+                         HorizontalOptions="Start"
+                         VerticalOptions="Center"
+                         BackgroundColor="red"/>
+
+            <Label Grid.Column="1"
+                   Text="Cadastro do Cuidador" 
                    FontSize="18" 
                    FontAttributes="Bold" 
                    TextColor="{StaticResource Primary}"
-                   HorizontalOptions="Center" 
-                   Margin="0,10,0,5"/>
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
 
+            <BoxView Grid.Column="2" 
+                     WidthRequest="30" 
+                     HeightRequest="30" 
+                     Color="Transparent"
+                     IsVisible="{Binding EhEdicao}"/>
+        </Grid>
 
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="25" Padding="30,20,30,30">
 
-            <VerticalStackLayout Spacing="2">
-                <Label Text="Nome do Cuidador" FontSize="14" TextColor="{StaticResource Primary}" />
-                <Entry Text="{Binding NomeCuidador}" 
-                       Placeholder="Digite seu nome completo" />
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Nome do Cuidador" FontSize="14" TextColor="{StaticResource Primary}" />
+                    <Entry Text="{Binding NomeCuidador}" 
+                           Placeholder="Digite seu nome completo" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Telefone" FontSize="14" TextColor="{StaticResource Primary}" />
+                    <Entry Text="{Binding TelefoneCuidador}"
+                           Keyboard="Telephone" 
+                           Placeholder="(00) 00000-0000">
+                        <Entry.Behaviors>
+                            <toolkit:MaskedBehavior x:Name="MascaraTelefone"
+                                                    Mask="(XX) XXXXX-XXXX" 
+                                                    UnmaskedCharacter="X" />
+                        </Entry.Behaviors>
+                    </Entry>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Email" FontSize="14" TextColor="{StaticResource Primary}" />
+                    <Entry Text="{Binding EmailCuidador}" 
+                           Keyboard="Email" 
+                           Placeholder="email@exemplo.com" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Senha" FontSize="14" TextColor="{StaticResource Primary}" />
+                    <Entry Text="{Binding SenhaCuidador}" 
+                           IsPassword="True" 
+                           Placeholder="Crie uma senha de acesso" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Confirmar Senha" FontSize="14" TextColor="{StaticResource Primary}" />
+                    <Entry Text="{Binding ConfirmacaoSenhaCuidador}" 
+                           IsPassword="True" 
+                           Placeholder="Digite a senha novamente" />
+                </VerticalStackLayout>
+
+                <Button Text="{Binding TextoBotaoAcao}" 
+                        Command="{Binding SalvarCuidadorCommand}" 
+                        BackgroundColor="{StaticResource Primary}" 
+                        TextColor="White"
+                        CornerRadius="25"
+                        HeightRequest="55"
+                        WidthRequest="260"
+                        HorizontalOptions="Center"
+                        Margin="0,25,0,0"
+                        FontAttributes="Bold"/>
+
             </VerticalStackLayout>
-
-            <VerticalStackLayout Spacing="2">
-                <Label Text="Telefone" FontSize="14" TextColor="{StaticResource Primary}" />
-                <Entry Text="{Binding TelefoneCuidador}"
-                       Keyboard="Telephone" 
-                       Placeholder="(00) 00000-0000">
-                    <Entry.Behaviors>
-                        <toolkit:MaskedBehavior x:Name="MascaraTelefone"
-                                                Mask="(XX) XXXXX-XXXX" 
-                                                UnmaskedCharacter="X" />
-                    </Entry.Behaviors>
-                </Entry>
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Spacing="2">
-                <Label Text="Email" FontSize="14" TextColor="{StaticResource Primary}" />
-                <Entry Text="{Binding EmailCuidador}" 
-                       Keyboard="Email" 
-                       Placeholder="email@exemplo.com" />
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Spacing="2">
-                <Label Text="Senha" FontSize="14" TextColor="{StaticResource Primary}" />
-                <Entry Text="{Binding SenhaCuidador}" 
-                       IsPassword="True" 
-                       Placeholder="Crie uma senha de acesso" />
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Spacing="2">
-                <Label Text="Confirmar Senha" FontSize="14" TextColor="{StaticResource Primary}" />
-                <Entry Text="{Binding ConfirmacaoSenhaCuidador}" 
-                       IsPassword="True" 
-                       Placeholder="Digite a senha novamente" />
-            </VerticalStackLayout>
-
-            <Button Text="CONCLUIR CADASTRO" 
-                    Command="{Binding SalvarCuidadorCommand}" 
-                    BackgroundColor="{StaticResource Primary}" 
-                    TextColor="White"
-                    CornerRadius="25"
-                    HeightRequest="55"
-                    WidthRequest="260"
-                    HorizontalOptions="Center"
-                    Margin="0,25,0,0"
-                    FontAttributes="Bold"/>
-
-        </VerticalStackLayout>
-    </ScrollView>
+        </ScrollView>
+    </Grid>
 </ContentPage>

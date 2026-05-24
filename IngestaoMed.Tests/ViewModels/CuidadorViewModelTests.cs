@@ -13,6 +13,7 @@ namespace IngestaoMed.Tests.ViewModels
         private readonly Mock<IConfigService> _configuracaoMock;
         private readonly Mock<ICuidadorService> _cuidadorServiceMock;
         private readonly Mock<IDialogService> _dialogServiceMock;
+        private readonly Mock<IAuthService> _authServiceMock;
         private readonly CuidadorViewModel _viewModel;
 
         public CuidadorViewModelTests()
@@ -31,27 +32,44 @@ namespace IngestaoMed.Tests.ViewModels
 
         #region InicializarAsync
 
+        #region InicializarAsync
+
         [Fact]
         public async Task InicializarAsync_ModoCadastro_DeveConfigurarEstadoInicial()
         {
-            // Arrange & Act
-            await _viewModel.InicializarAsync(0);
+            // Arrange
+            _configuracaoMock.Setup(c => c.ConfiguracaoCuidador).Returns((ConfiguracaoCuidador?)null);
+
+            // Act
+            await _viewModel.InicializarAsync();
 
             // Assert
             Assert.False(_viewModel.EhEdicao);
             Assert.Equal("CONCLUIR CADASTRO", _viewModel.TextoBotaoAcao);
+            Assert.Empty(_viewModel.NomeCuidador);
         }
 
         [Fact]
         public async Task InicializarAsync_ModoEdicao_DeveConfigurarEstadoParaEdicao()
         {
-            // Arrange & Act
-            await _viewModel.InicializarAsync(1);
+            // Arrange
+            var configFake = new ConfiguracaoCuidador { Id = 1 };
+            var cuidadorBanco = new Cuidador { Id = 1, Nome = "Ronaldo", Email = "ronaldo@teste.com", Telefone = "11999999999" };
+
+            _configuracaoMock.Setup(c => c.ConfiguracaoCuidador).Returns(configFake);
+            _cuidadorServiceMock.Setup(s => s.ObterPorIdAsync(1)).ReturnsAsync(cuidadorBanco);
+
+            // Act
+            await _viewModel.InicializarAsync();
 
             // Assert
             Assert.True(_viewModel.EhEdicao);
             Assert.Equal("SALVAR ALTERAÇÕES", _viewModel.TextoBotaoAcao);
+            Assert.Equal("Ronaldo", _viewModel.NomeCuidador);
+            Assert.Equal("ronaldo@teste.com", _viewModel.EmailCuidador);
         }
+
+        #endregion
 
         #endregion
 
@@ -188,7 +206,7 @@ namespace IngestaoMed.Tests.ViewModels
         public async Task SalvarCuidadorCommand_SucessoCadastro_DeveSalvarConfiguracoesENavegar()
         {
             // Arrange
-            await _viewModel.InicializarAsync(0);
+            await _viewModel.InicializarAsync();
             _viewModel.NomeCuidador = "Ronaldo Moreira";
             _viewModel.TelefoneCuidador = "(11) 98888-8888";
             _viewModel.EmailCuidador = "cuidador@teste.com";
@@ -220,14 +238,18 @@ namespace IngestaoMed.Tests.ViewModels
         public async Task SalvarCuidadorCommand_SucessoEdicao_DeveExibirMensagemAlertaEspecifica()
         {
             // Arrange
-            await _viewModel.InicializarAsync(5);
-            _viewModel.NomeCuidador = "Ronaldo Editado";
-            _viewModel.TelefoneCuidador = "11988888888";
-            _viewModel.EmailCuidador = "cuidador@edicao.com";
+            var configFake = new ConfiguracaoCuidador { Id = 1 };
+            var cuidadorBanco = new Cuidador { Id = 1, Nome = "Ronaldo", Email = "cuidador@edicao.com", Telefone = "11988888888" };
+
+            _configuracaoMock.Setup(c => c.ConfiguracaoCuidador).Returns(configFake);
+            _cuidadorServiceMock.Setup(s => s.ObterPorIdAsync(1)).ReturnsAsync(cuidadorBanco);
+            _cuidadorServiceMock.Setup(s => s.SalvarCuidadorAsync(It.IsAny<Cuidador>())).ReturnsAsync(true);
+
+            // Garante que a ViewModel carregue o estado de edição antes de salvar
+            await _viewModel.InicializarAsync();
+
             _viewModel.SenhaCuidador = "senha123";
             _viewModel.ConfirmacaoSenhaCuidador = "senha123";
-
-            _cuidadorServiceMock.Setup(s => s.SalvarCuidadorAsync(It.IsAny<Cuidador>())).ReturnsAsync(true);
 
             // Act
             await _viewModel.SalvarCuidadorCommand.ExecuteAsync(null);

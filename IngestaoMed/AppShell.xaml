@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:IngestaoMed"
     xmlns:views="clr-namespace:IngestaoMed.Views" 
+    xmlns:ui="clr-namespace:IngestaoMed.UI.Views" 
     xmlns:onboarding="clr-namespace:IngestaoMed.Views.Onboarding"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     Title="IngestaoMed"
@@ -55,5 +56,18 @@
         ContentTemplate="{DataTemplate onboarding:CuidadorPage}"
         Route="RegisterCuidadorPage" 
         FlyoutItemIsVisible="True"/>
+    
+    <MenuItem Text="Logout"
+          Command="{Binding LogoutCommand}"
+          IconImageSource="icon_logout.png" />
+    
+    
+    
+    
+    <ShellContent
+        Title="Alarme"
+        ContentTemplate="{DataTemplate ui:AlarmPage}"
+        Route="AlarmPage" 
+        FlyoutItemIsVisible="True"/> 
 
 </Shell>

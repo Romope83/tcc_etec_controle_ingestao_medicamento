@@ -37,7 +37,7 @@ namespace IngestaoMed
                 .ConfigureLifecycleEvents(events =>
                 {
 #if WINDOWS
-                events.AddWindows(windows => windows
+                    events.AddWindows(windows => windows
                     .OnWindowCreated(window =>
                     {
                         window.ExtendsContentIntoTitleBar = false;
@@ -48,13 +48,16 @@ namespace IngestaoMed
                         // Define as dimensões (Largura, Altura)
                         appWindow.Resize(new SizeInt32(450, 800));
                     }));
+
+                    //LocalNotificationCenter.ToastActivatorCLSID = "420CEB69-E110-42E0-A891-BDBF2AD174CA";
+                    LocalNotificationCenter.SetupBackgroundActivation();
 #endif
 
                 });
 
             // --- SERVIÇOS DE INFRAESTRUTURA E INTERFACE ---
-            builder.Services.AddTransient<ListaTratamentosViewModel>();
-            builder.Services.AddTransient<ListaTratamentosPage>();
+            
+            
             builder.Services.AddSingleton<IDialogService, MauiDialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
             builder.Services.AddSingleton<IVibrationService, VibrationService>();
@@ -67,6 +70,7 @@ namespace IngestaoMed
             builder.Services.AddSingleton<IConfigService, ConfigService>();
             builder.Services.AddSingleton<IAgendamentoConflitoService, AgendamentoConflitoService>();
             builder.Services.AddSingleton<IAgendamentoService, AgendamentoService>();
+            builder.Services.AddSingleton<ISnoozeScheduler, SnoozeScheduler>();
             // Define o caminho do arquivo .db3
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "IngestaoMed.db3");
             System.Diagnostics.Debug.Write(dbPath);
@@ -87,33 +91,41 @@ namespace IngestaoMed
             builder.Services.AddScoped<IMediaManagerService, MediaManagerService>(); 
             builder.Services.AddScoped<ITratamentoService, TratamentoService>();
             builder.Services.AddScoped<ICuidadorService, CuidadorService>();
+            builder.Services.AddScoped<IMonitorFalhaService, MonitorFalhaService>();
+            builder.Services.AddScoped<IEmailOutboxService, EmailOutboxService>();
             // --- REGISTRO DE UI (VIEWS E VIEWMODELS) ---
 
             // Registre as ViewModels
-            builder.Services.AddTransient<CadastroViewModel>();
+            builder.Services.AddTransient<WelcomeViewModel>();
             builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<CadastroViewModel>();
+            builder.Services.AddTransient<PacienteViewModel>();
             builder.Services.AddTransient<MedicamentoViewModel>();
+            builder.Services.AddTransient<ListaTratamentosViewModel>();
             builder.Services.AddTransient<ListaMedicamentosViewModel>();
             builder.Services.AddTransient<ListaPacientesViewModel>();
-            builder.Services.AddTransient<PacienteViewModel>();
             builder.Services.AddTransient<AlarmeViewModel>();
-            builder.Services.AddTransient<WelcomeViewModel>();
             builder.Services.AddTransient<TratamentoViewModel>();
             builder.Services.AddTransient<PacienteDetalhesViewModel>();
             builder.Services.AddTransient<CuidadorViewModel>();
             builder.Services.AddTransient<AgendamentoViewModel>();
+            builder.Services.AddTransient<SnoozeViewModel>();
 
             //builder.Services.AddTransient<RegisterCuidadorViewModel>();
             // Registre as Pages
-            builder.Services.AddTransient<CadastroPage>();
-            builder.Services.AddTransient<MedicamentoPage>();
-            builder.Services.AddTransient<ListaMedicamentosPage>();
-            builder.Services.AddTransient<LoginPage>();
-            builder.Services.AddTransient<ListaPacientesPage>();
-            builder.Services.AddTransient<PacientePage>();
             builder.Services.AddTransient<WelcomePage>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<CadastroPage>();
+            builder.Services.AddTransient<PacientePage>();
+            builder.Services.AddTransient<MedicamentoPage>();
+            builder.Services.AddTransient<ListaTratamentosPage>();
+            builder.Services.AddTransient<ListaMedicamentosPage>();
+            builder.Services.AddTransient<ListaPacientesPage>();
             builder.Services.AddTransient<CuidadorPage>();
             builder.Services.AddTransient<PacienteDetalhesPage>();
+            builder.Services.AddTransient<TratamentoPage>();
+            builder.Services.AddTransient<AgendamentoPage>();
+            //builder.Services.AddTransient<AlarmPage>();
             // STARTUP
             builder.Services.AddSingleton<AppShell>();
             builder.Services.AddSingleton<App>();

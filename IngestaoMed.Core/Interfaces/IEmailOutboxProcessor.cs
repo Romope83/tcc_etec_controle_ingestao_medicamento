@@ -4,5 +4,6 @@
     public interface IEmailOutboxProcessor
     {
         Task ProcessarFilaAsync();
+        Task IniciarProcessamentoAsync(CancellationToken cancellationToken);
     }
 }

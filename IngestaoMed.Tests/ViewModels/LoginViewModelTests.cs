@@ -1,5 +1,4 @@
 ﻿using IngestaoMed.Core.Interfaces;
-using IngestaoMed.Core.Services;
 using IngestaoMed.Core.ViewModels;
 using Moq;
 using System.Threading.Tasks;

@@ -2,44 +2,103 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="IngestaoMed.UI.Views.AlarmPage"
-             BackgroundColor="{StaticResource Gray950}"
+             BackgroundColor="#F8F9FA"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="*, Auto, Auto" Padding="30">
+    <Grid RowDefinitions="*, Auto" Padding="24" RowSpacing="20">
 
-        <!-- Área de Alerta e Identificação -->
-        <VerticalStackLayout Grid.Row="0" Spacing="20" VerticalOptions="Center">
-            <Image Source="pill_icon.png" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center" />
+        <ScrollView Grid.Row="0" VerticalOptions="FillAndExpand">
+            <VerticalStackLayout Spacing="24">
 
-            <Label Text="HORA DO MEDICAMENTO" 
-                   TextColor="{StaticResource Primary}"
-                   FontSize="14" FontAttributes="Bold" HorizontalTextAlignment="Center" CharacterSpacing="2"/>
+                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" Margin="0,12,0,4">
+                    <BoxView WidthRequest="8" HeightRequest="8" Color="#00A2E8" CornerRadius="4" VerticalOptions="Center"/>
+                    <Label Text="HORA DO MEDICAMENTO" 
+                           TextColor="#00A2E8"
+                           FontSize="12" 
+                           FontAttributes="Bold" 
+                           CharacterSpacing="1.5"/>
+                </HorizontalStackLayout>
 
-            <Label Text="{Binding AgendamentoAtual.Tratamento.Nome}" 
-                   FontSize="32" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                <Border BackgroundColor="White" 
+                        StrokeShape="RoundRectangle 16"
+                        StrokeThickness="0"
+                        Padding="20">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.05" />
+                    </Border.Shadow>
 
-            <Label Text="{Binding AgendamentoAtual.Tratamento.Dosagem}" 
-                   FontSize="22" Opacity="0.8" HorizontalTextAlignment="Center" />
-        </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="20">
 
-        <!-- Mensagem de Apoio/Descrição -->
-        <Label Grid.Row="1" 
-               Text="{Binding AgendamentoAtual.Tratamento.Descricao}"
-               HorizontalTextAlignment="Center" Margin="0,0,0,40" FontAttributes="Italic"/>
+                        <Border HeightRequest="160" 
+                                WidthRequest="160"
+                                HorizontalOptions="Center"
+                                StrokeShape="RoundRectangle 80" 
+                                StrokeThickness="0"
+                                BackgroundColor="#F0F2F5"
+                                Margin="0,10">
+                            <Image Source="{Binding AgendamentoAtual.CaminhoImagem, FallbackValue='pill_icon.png'}" 
+                                   Aspect="AspectFill"
+                                   HeightRequest="160"
+                                   WidthRequest="160" />
+                        </Border>
 
-        <!-- Botões de Ação Direta -->
-        <VerticalStackLayout Grid.Row="2" Spacing="15">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Medicamento" 
+                                   TextColor="#8A94A6" 
+                                   FontSize="12" 
+                                   FontAttributes="Bold"/>
+                            <Label Text="{Binding AgendamentoAtual.Tratamento.Nome}" 
+                                   TextColor="#1A2130"
+                                   FontSize="24" 
+                                   FontAttributes="Bold" />
+                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*, *">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="Dosagem" TextColor="#8A94A6" FontSize="12" FontAttributes="Bold"/>
+                                <Label Text="{Binding AgendamentoAtual.Tratamento.Dosagem}" TextColor="#4A5568" FontSize="16"/>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="End">
+                                <Label Text="Situação" TextColor="#8A94A6" FontSize="12" FontAttributes="Bold"/>
+                                <Label Text="Horário Atrasado" TextColor="#E53E3E" FontSize="15" FontAttributes="Bold"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <BoxView HeightRequest="1" Color="#EDF2F7" HorizontalOptions="FillAndExpand" />
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Instruções e Orientações" TextColor="#8A94A6" FontSize="12" FontAttributes="Bold"/>
+                            <Label Text="{Binding AgendamentoAtual.Tratamento.Descricao}"
+                                   TextColor="#4A5568"
+                                   FontSize="14"
+                                   LineHeight="1.2"/>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="12" VerticalOptions="End" Margin="0,0,0,10">
             <Button Text="CONFIRMAR INGESTÃO" 
                     Command="{Binding ConfirmarIngestaoCommand}"
-                    BackgroundColor="{StaticResource Success}"
-                    HeightRequest="80" FontSize="18" FontAttributes="Bold" />
+                    BackgroundColor="#947CF2"
+                    TextColor="White"
+                    HeightRequest="56" 
+                    CornerRadius="28"
+                    FontSize="16" 
+                    FontAttributes="Bold" />
 
-            <Button Text="Soneca (10 min)" 
+            <Button Text="Adiar Soneca (10 min)" 
                     Command="{Binding AdiarSonecaCommand}"
                     BackgroundColor="Transparent"
-                    BorderColor="{StaticResource Gray400}"
-                    BorderWidth="1"
-                    HeightRequest="60" />
+                    TextColor="#4A5568"
+                    BorderColor="#E2E8F0"
+                    BorderWidth="1.5"
+                    CornerRadius="25"
+                    HeightRequest="50"
+                    FontSize="15" />
         </VerticalStackLayout>
 
     </Grid>

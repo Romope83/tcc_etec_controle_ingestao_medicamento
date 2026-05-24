@@ -22,13 +22,15 @@ namespace IngestaoMed.Core.Data
             _connection = new SQLiteAsyncConnection(_dbPath);
 
             await _connection.CreateTableAsync<Cuidador>();
-            await _connection.CreateTableAsync<Paciente>();
-            await _connection.CreateTableAsync<Medicamento>();
-            await _connection.CreateTableAsync<Tratamento>();
             await _connection.CreateTableAsync<Agendamento>();
-            await _connection.CreateTableAsync<Registro>();
-            await _connection.CreateTableAsync<MedicamentoTratamento>();
             await _connection.CreateTableAsync<AnexoMedia>();
+            await _connection.CreateTableAsync<EmailFila>();
+            await _connection.CreateTableAsync<LogEvento>();
+            await _connection.CreateTableAsync<LogMedicamento>();
+            await _connection.CreateTableAsync<Medicamento>();
+            await _connection.CreateTableAsync<MedicamentoTratamento>();
+            await _connection.CreateTableAsync<Paciente>();
+            await _connection.CreateTableAsync<Tratamento>();
         }
 
         public async Task<bool> InserirAsync<T>(T entidade) where T : new()

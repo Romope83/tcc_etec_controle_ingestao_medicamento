@@ -21,7 +21,6 @@ namespace IngestaoMed.Core.Services
 
         public async Task ProcessarFilaAsync()
         {
-            // Se o Mock (ou o Hardware) disser que não tem internet, o Core para aqui.
             if (!_connectivity.TemInternet)
                 return;
 
@@ -29,14 +28,48 @@ namespace IngestaoMed.Core.Services
 
             foreach (var email in pendentes)
             {
-                // Tenta o envio físico através do IEmailService
                 bool enviadoComSucesso = await _emailService.EnviarAlertaFalhaAsync(
                     email.Destinatario,
                     email.Assunto,
                     email.Corpo);
 
-                // Atualiza o banco via OutboxService (sucesso ou incremento de tentativa)
                 await _outboxService.AtualizarStatusEnvioAsync(email.Id, enviadoComSucesso);
+            }
+        }
+
+        public async Task IniciarProcessamentoAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    if (_connectivity.TemInternet)
+                    {
+                        var emailsPendentes = await _outboxService.ObterPendentesAsync();
+
+                        foreach (var email in emailsPendentes)
+                        {
+                            // 3. Tenta enviar via MailKit/SMTP
+                            bool sucesso = await _emailService.EnviarAlertaFalhaAsync(
+                                email.Destinatario,
+                                "Paciente",
+                                email.Corpo
+                            );
+
+                            if (sucesso)
+                            {
+                                // Atualize o status no banco para Enviado = true através do seu service/context
+                                email.Enviado = true;
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // Evita que uma falha de rede ou banco quebre o loop definitivo do background
+                }
+
+                await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
             }
         }
     }

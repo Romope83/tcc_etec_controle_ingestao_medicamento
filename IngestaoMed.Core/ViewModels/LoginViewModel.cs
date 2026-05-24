@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IngestaoMed.Core.Interfaces;
-using IngestaoMed.Core.Services;
 using System.Threading.Tasks;
 
 namespace IngestaoMed.Core.ViewModels

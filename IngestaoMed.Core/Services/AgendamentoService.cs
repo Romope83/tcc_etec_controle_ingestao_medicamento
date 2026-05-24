@@ -130,7 +130,7 @@ namespace IngestaoMed.Core.Services
 
             var as40Primeiras = dosesPendentes
                 .OrderBy(a => a.ProximoAlarme)
-                .Take(40)
+                .Take(2)
                 .ToList();
 
             await _alarmService.SincronizarJanelaAlarmesAsync(as40Primeiras);
