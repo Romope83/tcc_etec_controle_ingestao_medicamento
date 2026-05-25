@@ -56,9 +56,26 @@ namespace IngestaoMed
                 });
 
             // --- SERVIÇOS DE INFRAESTRUTURA E INTERFACE ---
-            
-            
+#if DEBUG
+            // Aponta para o Papercut ou MailHog rodando na sua máquina
+            builder.Services.AddSingleton<IEmailSettings>(new EmailSettings
+            {
+                Host = "10.0.2.2",
+                Port = 2525,
+                SenderEmail = "fake@mail.com",
+                SenderPassword = "fakePass"
+            });
+#else
+    // Configuração real para produção
+    builder.Services.AddSingleton<IEmailSettings>(new EmailSettings 
+    { 
+        Host = "smtp.gmail.com", 
+        Port = 587 
+    });
+#endif
+
             builder.Services.AddSingleton<IDialogService, MauiDialogService>();
+            builder.Services.AddTransient<ITimerService, MauiTimerService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
             builder.Services.AddSingleton<IVibrationService, VibrationService>();
             builder.Services.AddSingleton<IAlarmService, AlarmService>();
@@ -125,6 +142,7 @@ namespace IngestaoMed
             builder.Services.AddTransient<PacienteDetalhesPage>();
             builder.Services.AddTransient<TratamentoPage>();
             builder.Services.AddTransient<AgendamentoPage>();
+            builder.Services.AddTransient<SplashPage>();
             //builder.Services.AddTransient<AlarmPage>();
             // STARTUP
             builder.Services.AddSingleton<AppShell>();

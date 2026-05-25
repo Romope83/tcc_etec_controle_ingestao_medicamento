@@ -38,14 +38,23 @@ namespace IngestaoMed.Core.Services
 
         public async Task LimparFilaAntigaAsync(int diasRetencao = 7)
         {
-            var dataCorte = DateTime.Now.AddDays(-diasRetencao);
-            var todos = await _db.BuscarTodosAsync<EmailFila>();
-
-            var paraRemover = todos.Where(e => e.Enviado && e.DataCriacao < dataCorte).ToList();
-
-            foreach (var email in paraRemover)
+            try
             {
-                await _db.ExcluirAsync(email);
+                var dataCorte = DateTime.Now.AddDays(-diasRetencao);
+                var todos = await _db.BuscarTodosAsync<EmailFila>();
+
+                var paraRemover = todos.Where(e => e.Enviado && e.DataCriacao < dataCorte).ToList();
+
+                foreach (var email in paraRemover)
+                {
+                    await _db.ExcluirAsync(email);
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                System.Diagnostics.Debug.WriteLine($"Erro na limpeza da fila: {ex.Message}");
             }
         }
     }

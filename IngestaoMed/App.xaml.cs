@@ -33,34 +33,7 @@ public partial class App : Application
     {
         base.OnStart();
         IniciarTarefaBackground();
-        await WindowsInicialization();
     }
-
-    private async Task WindowsInicialization()
-    {
-        if (_configService.EhPrimeiroAcesso)
-        {
-            await Shell.Current.GoToAsync("//WelcomePage");
-            return;
-        }
-
-        var config = _configService.ConfiguracaoCuidador;
-        bool existeUsuario = await _authService.ExisteCuidadorCadastrado();
-
-        if (config != null)
-        {
-            await Shell.Current.GoToAsync("//ListaPacientesPage");
-        }
-        else if (existeUsuario)
-        {
-            await Shell.Current.GoToAsync("//LoginPage");
-        }
-        else
-        {
-            await Shell.Current.GoToAsync("//WelcomePage");
-        }
-    }
-
 
 
     protected override Window CreateWindow(IActivationState? activationState)

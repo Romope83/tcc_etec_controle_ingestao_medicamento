@@ -1,12 +1,28 @@
 using IngestaoMed.Core.ViewModels;
 
-namespace IngestaoMed.UI.Views;
-
-public partial class AlarmPage : ContentPage
+namespace IngestaoMed.UI.Views
 {
-    public AlarmPage(AlarmeViewModel viewModel)
+    [QueryProperty(nameof(AgendamentoIdStr), "agendamentoId")]
+    public partial class AlarmPage : ContentPage
     {
-        InitializeComponent();
-        BindingContext = viewModel;
+        private readonly AlarmeViewModel _viewModel;
+
+        public string AgendamentoIdStr
+        {
+            set
+            {
+                if (int.TryParse(value, out int id) && _viewModel != null)
+                {
+                    _viewModel.AgendamentoId = id;
+                }
+            }
+        }
+
+        public AlarmPage(AlarmeViewModel viewModel)
+        {
+            InitializeComponent();
+            _viewModel = viewModel;
+            BindingContext = _viewModel;
+        }
     }
 }

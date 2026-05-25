@@ -30,5 +30,7 @@ namespace IngestaoMed.Core.Models
 
         [Ignore]
         public string? NomeRemedioEspecifico { get; set; }
+        [Ignore]
+        public bool Atrasado { get; set; } = false;
     }
 }

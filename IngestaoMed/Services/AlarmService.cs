@@ -40,8 +40,10 @@ namespace IngestaoMed.Services
                 LocalNotificationCenter.Current.CancelAll();
 
                 // Agenda estritamente o lote enviado pelo Core
+                //var umMinuto = DateTime.Now.AddMicroseconds(30);
                 foreach (var dose in proximosAlarmes)
                 {
+                    //dose.ProximoAlarme = umMinuto;
                     var request = _mapper.MapToRequest(dose);
                     if (request != null)
                     {

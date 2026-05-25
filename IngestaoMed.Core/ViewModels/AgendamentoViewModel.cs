@@ -16,17 +16,20 @@ namespace IngestaoMed.Core.ViewModels
         private readonly IDialogService _dialogService;
         private readonly IAgendamentoConflitoService _conflitoService;
         private readonly IAgendamentoService _agendamentoService;
+        private readonly ITratamentoService _tratamentoService;
 
         public AgendamentoViewModel(
             INavigationService navigation,
             IDialogService dialogService,
             IAgendamentoConflitoService @conflitoService,
-            IAgendamentoService agendamentoService)
+            IAgendamentoService agendamentoService,
+            ITratamentoService tratamentoService)
         {
             _navigation = navigation;
             _dialogService = dialogService;
             _conflitoService = @conflitoService;
             _agendamentoService = agendamentoService;
+            _tratamentoService = tratamentoService;
         }
 
         [ObservableProperty] private int _tratamentoId;
@@ -53,6 +56,8 @@ namespace IngestaoMed.Core.ViewModels
         [ObservableProperty] private TimeSpan _horaFim = new TimeSpan(23, 59, 0);
         [ObservableProperty] private bool _ativado = true;
         [ObservableProperty] private int _tolerancia = 30;
+        [ObservableProperty] private bool _ehTempoEmHoras = false;
+
 
         public ObservableCollection<Medicamento> SugestoesBusca { get; } = new();
         private List<Medicamento> _listaOriginal = new();
@@ -71,9 +76,13 @@ namespace IngestaoMed.Core.ViewModels
         {
             TratamentoId = tratamentoId;
             MedicamentoTratamentoId = medicamentoTratamentoId;
+            var tratamento = await _agendamentoService.ObterTratamentoPorIdAsync(tratamentoId);
+            //var medtrat = await _tratamentoService.ObterMedicamentoTratamentoPorIdAsync(medicamentoTratamentoId);
+            //if (tratamento == null) return;
 
             if (medicamentoTratamentoId > 0)
             {
+                PossuiDosesGeradas = true;
                 var vinculo = await _agendamentoService.ObterVinculoPorIdAsync(medicamentoTratamentoId);
                 if (vinculo != null)
                 {
@@ -101,13 +110,30 @@ namespace IngestaoMed.Core.ViewModels
                         DataFim = dosesOrdenadas.Last().HorarioOriginal.Date;
                         HoraFim = dosesOrdenadas.Last().HorarioOriginal.TimeOfDay;
 
+                        var toleranciaTimespan = TimeSpan.FromMinutes(Tolerancia);
+
+                        DateTime agora = DateTime.Now;
                         foreach (var dose in dosesOrdenadas)
                         {
+                            if (dose.Status == "Pendente" && agora > dose.ProximoAlarme.Add(toleranciaTimespan))
+                            {
+                                
+
+                                dose.Atrasado = true;
+                            }
+                            else
+                            {
+                                dose.Atrasado = false;
+                            }
                             DosesGeradas.Add(dose);
                         }
 
                         PossuiDosesGeradas = true;
                         EstaEditando = true;
+                    }
+                    else
+                    {
+                        PossuiDosesGeradas = false;
                     }
                 }
             }
@@ -119,6 +145,8 @@ namespace IngestaoMed.Core.ViewModels
                 Dose = string.Empty;
                 PossuiDosesGeradas = false;
                 EstaEditando = false;
+                DataFim = tratamento.DataFim ??DateTime.Now.AddDays(1);
+                
                 DosesGeradas.Clear();
 
                 await CarregarTodosMedicamentosAsync();
@@ -193,7 +221,10 @@ namespace IngestaoMed.Core.ViewModels
                     HorarioConfirmacao = null
                 });
 
-                atual = atual.AddHours(IntervaloHoras);
+                atual = EhTempoEmHoras
+                        ? atual.AddHours(IntervaloHoras)
+                        : atual.AddMinutes(IntervaloHoras);
+
             }
         }
 
@@ -288,6 +319,7 @@ namespace IngestaoMed.Core.ViewModels
 
             PossuiDosesGeradas = true;
             EstaEditando = true;
+
 
             OnPropertyChanged(nameof(PodeDeletarDoses));
         }

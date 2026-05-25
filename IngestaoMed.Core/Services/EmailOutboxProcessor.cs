@@ -64,7 +64,7 @@ namespace IngestaoMed.Core.Services
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // Evita que uma falha de rede ou banco quebre o loop definitivo do background
                 }

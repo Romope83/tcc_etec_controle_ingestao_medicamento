@@ -14,6 +14,12 @@
     IsVisible="Collapse">
 
     <ShellContent
+        Title="Carregando"
+        ContentTemplate="{DataTemplate onboarding:SplashPage}"
+        Route="SplashPage"
+        FlyoutItemIsVisible="False" />
+
+    <ShellContent
         Title="Boas-vindas"
         ContentTemplate="{DataTemplate onboarding:WelcomePage}"
         Route="WelcomePage"
@@ -56,18 +62,9 @@
         ContentTemplate="{DataTemplate onboarding:CuidadorPage}"
         Route="RegisterCuidadorPage" 
         FlyoutItemIsVisible="True"/>
-    
+
     <MenuItem Text="Logout"
           Command="{Binding LogoutCommand}"
           IconImageSource="icon_logout.png" />
-    
-    
-    
-    
-    <ShellContent
-        Title="Alarme"
-        ContentTemplate="{DataTemplate ui:AlarmPage}"
-        Route="AlarmPage" 
-        FlyoutItemIsVisible="True"/> 
 
 </Shell>

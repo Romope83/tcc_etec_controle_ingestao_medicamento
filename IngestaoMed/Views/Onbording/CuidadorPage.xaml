@@ -16,15 +16,18 @@
               Padding="20,15,20,0" 
               VerticalOptions="Center">
 
-            <ImageButton Grid.Column="0"                         
-                         Source="dona_maria.png" 
-                         Command="{Binding VoltarCommand}"
-                         
-                         HeightRequest="30"
-                         WidthRequest="30"
-                         HorizontalOptions="Start"
-                         VerticalOptions="Center"
-                         BackgroundColor="red"/>
+            <Button Grid.Column="0"
+                    Text="‹" 
+                    FontSize="28" 
+                    FontAttributes="Bold"
+                    TextColor="{StaticResource Primary}" 
+                    BackgroundColor="Transparent" 
+                    Command="{Binding VoltarCommand}"
+                    HeightRequest="35"
+                    WidthRequest="35"
+                    Padding="0"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center" />
 
             <Label Grid.Column="1"
                    Text="Cadastro do Cuidador" 

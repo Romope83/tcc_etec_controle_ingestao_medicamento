@@ -6,7 +6,6 @@ using IngestaoMed.Core.Services;
 using IngestaoMed.Core.ViewModels;
 using Plugin.LocalNotification;
 using Plugin.LocalNotification.EventArgs;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace IngestaoMed.Services
@@ -36,35 +35,20 @@ namespace IngestaoMed.Services
             LocalNotificationCenter.Current.NotificationActionTapped += OnNotificationActionTapped;
         }
 
+        // Método mantido limpo, já que não há mais botões nativos no card de notificação
         public void RegistrarAcoes()
         {
-            var acaoConfirmar = new NotificationAction(NotificationConstants.ActionTomeiId)
-            {
-                Title = "Tomei",
-                Android = { IconName = { ResourceName = "check_icon" } }
-            };
-
-            var acaoSoneca = new NotificationAction(NotificationConstants.ActionSonecaId)
-            {
-                Title = "Soneca (10 min)",
-                Android = { IconName = { ResourceName = "snooze_icon" } }
-            };
-
-            var categoria = new NotificationCategory(NotificationCategoryType.Status)
-            {
-                ActionList = new HashSet<NotificationAction> { acaoConfirmar, acaoSoneca }
-            };
-
-            LocalNotificationCenter.Current.RegisterCategoryList(new HashSet<NotificationCategory> { categoria });
+            // Categoria vazia ou apenas registro básico se o plugin exigir, sem ActionList com botões.
         }
 
         private async void OnNotificationActionTapped(NotificationActionEventArgs e)
         {
-            int actionId = e.ActionId;
-
             if (int.TryParse(e.Request.ReturningData, out int agendamentoId))
             {
-                await ProcessarAcaoAsync(actionId, agendamentoId);
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    await Shell.Current.GoToAsync($"AlarmPage?agendamentoId={agendamentoId}");
+                });
             }
         }
 
@@ -82,7 +66,7 @@ namespace IngestaoMed.Services
             {
                 if (_snoozeScheduler.PodeAdiar(agendamentoId))
                 {
-                    await _snoozeService.AgendarSonecaAsync(agendamentoId, 10);
+                    await _snoozeService.AgendarSonecaAsync(agendamentoId, 1);
                     await _logService.RegistrarAsync(agendamentoId, TipoEventoLog.SonecaDisparada);
                     await _viewModel.AdiarSonecaCommand.ExecuteAsync(null);
                 }

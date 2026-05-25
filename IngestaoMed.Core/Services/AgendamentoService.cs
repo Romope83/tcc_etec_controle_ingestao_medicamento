@@ -121,6 +121,7 @@ namespace IngestaoMed.Core.Services
 
         public async Task SincronizarFilaDeAlarmesAsync()
         {
+
             var agora = DateTime.Now;
             var dosesPendentes = await _db.BuscarOndeAsync<Agendamento>(a =>
                 a.Status == "Pendente" &&
@@ -130,7 +131,7 @@ namespace IngestaoMed.Core.Services
 
             var as40Primeiras = dosesPendentes
                 .OrderBy(a => a.ProximoAlarme)
-                .Take(2)
+                .Take(1)
                 .ToList();
 
             await _alarmService.SincronizarJanelaAlarmesAsync(as40Primeiras);
