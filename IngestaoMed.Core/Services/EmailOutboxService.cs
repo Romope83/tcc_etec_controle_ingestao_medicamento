@@ -16,7 +16,6 @@ namespace IngestaoMed.Core.Services
         public async Task<List<EmailFila>> ObterPendentesAsync()
         {
             var todos = await _db.BuscarTodosAsync<EmailFila>();
-            // Filtra e-mails não enviados e que não estouraram o limite de 3 tentativas
             return todos.Where(e => !e.Enviado && e.Tentativas < 3).ToList();
         }
 
@@ -39,15 +38,23 @@ namespace IngestaoMed.Core.Services
 
         public async Task LimparFilaAntigaAsync(int diasRetencao = 7)
         {
-            var dataCorte = DateTime.Now.AddDays(-diasRetencao);
-            var todos = await _db.BuscarTodosAsync<EmailFila>();
-
-            // Remove o que já foi enviado há mais de X dias para não inflar o SQLite do celular
-            var paraRemover = todos.Where(e => e.Enviado && e.DataCriacao < dataCorte).ToList();
-
-            foreach (var email in paraRemover)
+            try
             {
-                await _db.ExcluirAsync(email);
+                var dataCorte = DateTime.Now.AddDays(-diasRetencao);
+                var todos = await _db.BuscarTodosAsync<EmailFila>();
+
+                var paraRemover = todos.Where(e => e.Enviado && e.DataCriacao < dataCorte).ToList();
+
+                foreach (var email in paraRemover)
+                {
+                    await _db.ExcluirAsync(email);
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                System.Diagnostics.Debug.WriteLine($"Erro na limpeza da fila: {ex.Message}");
             }
         }
     }

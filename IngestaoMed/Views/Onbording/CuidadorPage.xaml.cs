@@ -1,14 +1,17 @@
 using IngestaoMed.Core.ViewModels;
 
-namespace IngestaoMed.Views.Onboarding;
-
-public partial class CuidadorPage : ContentPage
+namespace IngestaoMed.Views.Onboarding
 {
-
-    public CuidadorPage(CuidadorViewModel viewModel)
+    public partial class CuidadorPage : ContentPage
     {
-        InitializeComponent();
+        private readonly CuidadorViewModel _viewModel;
 
-        BindingContext = viewModel;
+        public CuidadorPage(CuidadorViewModel viewModel)
+        {
+            InitializeComponent();
+            _viewModel = viewModel;
+            BindingContext = _viewModel;
+            _viewModel.InicializarAsync();
+        }
     }
 }

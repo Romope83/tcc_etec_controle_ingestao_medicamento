@@ -4,7 +4,7 @@ using IngestaoMed.Core.Services;
 using IngestaoMed.Core.Enums;
 using System.Collections.Generic;
 
-namespace IngestaoMed.Tests.Business
+namespace IngestaoMed.Tests.Logic
 {
     public class HistoricoAdesaoTests
     {

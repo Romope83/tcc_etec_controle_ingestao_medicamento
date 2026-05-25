@@ -25,11 +25,12 @@ namespace IngestaoMed.Core.Services
             {
                 if (cuidador.Id > 0)
                 {
-                    return await _db.InserirAsync(cuidador);
+                    cuidador.PasswordHash = BCrypt.Net.BCrypt.HashPassword(cuidador.PasswordHash);
+
+                    return await _db.AtualizarAsync(cuidador)>0;
                 }
 
                 string senhaLimpa = cuidador.PasswordHash;
-
                 return await _authService.RegistrarCuidador(cuidador, senhaLimpa);
             }
             catch (Exception ex)
@@ -37,6 +38,10 @@ namespace IngestaoMed.Core.Services
                 System.Diagnostics.Debug.WriteLine($"Erro ao salvar cuidador: {ex.Message}");
                 return false;
             }
+        }
+        public async Task<Cuidador?> ObterPorIdAsync(int id)
+        {
+            return await _db.BuscarPrimeiroAsync<Cuidador>(c => c.Id == id);
         }
     }
 }

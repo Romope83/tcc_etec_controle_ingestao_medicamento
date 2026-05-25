@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
 using System.Text.RegularExpressions;
-using IngestaoMed.Core.Services;
 using System;
 using System.Threading.Tasks;
 using System.Linq;

@@ -51,13 +51,13 @@ namespace IngestaoMed.Core.ViewModels
         private async Task CarregarPacientesAsync()
         {
             var lista = await _service.ObterTodosAsync();
-            await AtualizarListaUI(lista);
+            AtualizarListaUI(lista);
         }
 
         [RelayCommand]
         private async Task NavegarParaCadastroAsync()
         {
-            await _nav.GoToAsync("PacientePage");
+          await _nav.GoToAsync("PacientePage");
         }
 
         [RelayCommand]
@@ -67,18 +67,15 @@ namespace IngestaoMed.Core.ViewModels
             await _nav.GoToAsync($"PacienteDetalhesPage?id={pacienteId}");
         }
 
-        private async Task AtualizarListaUI(List<Paciente> lista)
+        private  void AtualizarListaUI(List<Paciente> lista)
         {
-            await Task.Run(
-                () =>
-                {
-                    Pacientes.Clear();
-                    foreach (var p in lista)
-                    {
-                        Pacientes.Add(p);
-                    }
-                }
-            );
+
+            Pacientes.Clear();
+            foreach (var p in lista)
+            {
+                Pacientes.Add(p);
+            }
+
         }
         partial void OnTextoBuscaChanged(string value)
         {
@@ -116,7 +113,7 @@ namespace IngestaoMed.Core.ViewModels
 
                 if (token.IsCancellationRequested) return;
 
-                await AtualizarListaUI(resultado);
+                AtualizarListaUI(resultado);
             }
             catch { /* ... */ }
         }

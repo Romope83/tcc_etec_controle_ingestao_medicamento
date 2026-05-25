@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="IngestaoMed.Views.Onboarding.SplashPage"
+             NavigationPage.HasNavigationBar="False"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             Shell.FlyoutBehavior="Disabled"
+             BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#121212}">
+
+    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
+
+        <VerticalStackLayout Spacing="10">
+            <Label Text="IngestaoMed" 
+                   FontSize="32" 
+                   FontAttributes="Bold" 
+                   TextColor="{DynamicResource Primary}" 
+                   HorizontalOptions="Center"/>
+
+            <Border StrokeShape="RoundRectangle 20" 
+        StrokeThickness="1"
+        Stroke="{DynamicResource Primary}"
+        BackgroundColor="White"
+        Padding="10"
+        HorizontalOptions="Center">
+
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Opacity="0.2" Radius="10"/>
+                </Border.Shadow>
+
+                <Image Source="tratamento_icone.png" 
+           WidthRequest="180" 
+           HeightRequest="180" 
+           HorizontalOptions="Center"
+           Aspect="AspectFit"/>
+            </Border>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Spacing="15" HorizontalOptions="Center">
+            <ActivityIndicator IsRunning="True" 
+                               Color="{DynamicResource Primary}" 
+                               WidthRequest="45" 
+                               HeightRequest="45" 
+                               HorizontalOptions="Center"/>
+            <Label Text="Carregando dados..." 
+                   FontSize="15" 
+                   TextColor="{DynamicResource Primary}" 
+                   HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+    </VerticalStackLayout>
+</ContentPage>

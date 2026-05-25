@@ -38,7 +38,6 @@ namespace IngestaoMed.Core.Services
 
             _snoozeScheduler.RegistrarSoneca(agendamentoId);
 
-            // Importante: Atualizar o banco com o novo horário antes de agendar o alarme físico
             await _database.AtualizarAsync(agendamento);
 
             await _alarmService.AgendarNotificacaoAsync(agendamento);
@@ -48,7 +47,6 @@ namespace IngestaoMed.Core.Services
 
         public void CancelarSoneca(int agendamentoId)
         {
-            // O uso de Fire and Forget aqui depende da sua implementação de extensões
             _alarmService.CancelarAlarmeAsync(agendamentoId);
             _snoozeScheduler.LimparHistorico(agendamentoId);
         }

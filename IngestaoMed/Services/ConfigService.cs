@@ -53,5 +53,10 @@ namespace IngestaoMed.Services
                 }
             }
         }
+
+        public void RemoverSessaoCuidador()
+        {
+            Preferences.Default.Remove(ConfigCuidadorKey);
+        }
     }
 }

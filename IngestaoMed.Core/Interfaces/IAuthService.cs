@@ -1,6 +1,6 @@
 ﻿using IngestaoMed.Core.Models;
 
-namespace IngestaoMed.Core.Services
+namespace IngestaoMed.Core.Interfaces
 {
     public interface IAuthService
     {
@@ -9,6 +9,7 @@ namespace IngestaoMed.Core.Services
         Task<Cuidador?> GetCuidadorAtual();
         Task<bool> ValidarEmail(string email);
         Task<bool> ValidarLogin(string email, string senhaLimpa);
+        Task FazerLogout();
 
     }
 }

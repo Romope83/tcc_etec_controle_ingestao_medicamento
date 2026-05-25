@@ -15,7 +15,7 @@ namespace IngestaoMed.Core.ViewModels
         private readonly ICuidadorService _cuidadorService;
         private readonly IDialogService _dialogService;
 
-        private int _cuidadorIdAtual;
+        private Cuidador? _cuidadorIdAtualObjeto;
 
         [ObservableProperty] private string nomeCuidador = string.Empty;
         [ObservableProperty] private string emailCuidador = string.Empty;
@@ -23,7 +23,6 @@ namespace IngestaoMed.Core.ViewModels
         [ObservableProperty] private string senhaCuidador = string.Empty;
         [ObservableProperty] private string confirmacaoSenhaCuidador = string.Empty;
         [ObservableProperty] private bool ehEdicao = false;
-
         [ObservableProperty] private string textoBotaoAcao = "CONCLUIR CADASTRO";
 
         public CuidadorViewModel(
@@ -38,17 +37,53 @@ namespace IngestaoMed.Core.ViewModels
             _dialogService = dialogService;
         }
 
-        public async Task InicializarAsync(int cuidadorId)
+        public async Task InicializarAsync()
         {
-            _cuidadorIdAtual = cuidadorId;
-            EhEdicao = _cuidadorIdAtual > 0;
+            var cuidadorId = 0;
+            if (_configuracao.ConfiguracaoCuidador != null)
+            {
+                cuidadorId = _configuracao.ConfiguracaoCuidador.Id;
+            }
 
+            if (cuidadorId > 0)
+            {
+                _cuidadorIdAtualObjeto = await _cuidadorService.ObterPorIdAsync(cuidadorId);
+            }
+
+            EhEdicao = _cuidadorIdAtualObjeto != null;
             TextoBotaoAcao = EhEdicao ? "SALVAR ALTERAÇÕES" : "CONCLUIR CADASTRO";
 
-            if (EhEdicao)
+            if (EhEdicao && _cuidadorIdAtualObjeto != null)
             {
-                // Código para carregar dados do cuidador se for modo edição...
+                try
+                {
+                    NomeCuidador = _cuidadorIdAtualObjeto.Nome;
+                    EmailCuidador = _cuidadorIdAtualObjeto.Email;
+                    TelefoneCuidador = _cuidadorIdAtualObjeto.Telefone;
+
+                    SenhaCuidador = string.Empty;
+                    ConfirmacaoSenhaCuidador = string.Empty;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Erro ao carregar dados do cuidador: {ex.Message}");
+                }
             }
+            else
+            {
+                _cuidadorIdAtualObjeto = null;
+                NomeCuidador = string.Empty;
+                EmailCuidador = string.Empty;
+                TelefoneCuidador = string.Empty;
+                SenhaCuidador = string.Empty;
+                ConfirmacaoSenhaCuidador = string.Empty;
+            }
+        }
+
+        [RelayCommand]
+        private async Task Voltar()
+        {
+            await _navegacao.GoToAsync("ListaPacientesPage");
         }
 
         [RelayCommand]
@@ -60,22 +95,42 @@ namespace IngestaoMed.Core.ViewModels
             {
                 string telefoneApenasNumeros = Regex.Replace(TelefoneCuidador ?? string.Empty, @"[^\d]", "");
 
-                var cuidador = new Cuidador
+                // Se for Modo Edição (cuidador logado), garante que temos o objeto preenchido
+                if (EhEdicao)
                 {
-                    Id = _cuidadorIdAtual,
-                    Nome = NomeCuidador,
-                    Email = EmailCuidador,
-                    Telefone = telefoneApenasNumeros,
-                    PasswordHash = SenhaCuidador
-                };
+                    if (_cuidadorIdAtualObjeto == null)
+                    {
+                        await _dialogService.DisplayAlert("Erro", "Erro ao recuperar os dados do cuidador logado.", "OK");
+                        return;
+                    }
+                }
+                else
+                {
+                    // Se NÃO for edição (Cadastro Novo), cria uma nova instância limpa
+                    _cuidadorIdAtualObjeto = new Cuidador();
+                }
 
-                bool sucesso = await _cuidadorService.SalvarCuidadorAsync(cuidador);
+                // Alimenta as propriedades na instância correta
+                _cuidadorIdAtualObjeto.Nome = NomeCuidador;
+                _cuidadorIdAtualObjeto.Email = EmailCuidador;
+                _cuidadorIdAtualObjeto.Telefone = telefoneApenasNumeros;
+
+                // Se uma nova senha foi digitada, atualiza o campo. 
+                // Se for edição e ficou em branco, mantém o hash que veio do banco.
+                if (!string.IsNullOrWhiteSpace(SenhaCuidador))
+                {
+                    _cuidadorIdAtualObjeto.PasswordHash = SenhaCuidador;
+                }
+
+                // O serviço agora decide internamente: se Id > 0 atualiza no banco, senão registra criptografando via AuthService
+                bool sucesso = await _cuidadorService.SalvarCuidadorAsync(_cuidadorIdAtualObjeto);
 
                 if (sucesso)
                 {
+                    // Atualiza o estado da sessão local no IConfigService com os novos dados salvos
                     _configuracao.ConfiguracaoCuidador = new ConfiguracaoCuidador
                     {
-                        Id = cuidador.Id,
+                        Id = _cuidadorIdAtualObjeto.Id,
                         NomeCuidador = NomeCuidador,
                         EmailCuidador = EmailCuidador,
                         AlertaAtivado = true,
@@ -131,15 +186,22 @@ namespace IngestaoMed.Core.ViewModels
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(SenhaCuidador) || string.IsNullOrWhiteSpace(ConfirmacaoSenhaCuidador))
+            if (!EhEdicao)
             {
-                await _dialogService.DisplayAlert("Campo Obrigatório", "Por favor, preencha a senha e a confirmação de senha.", "OK");
-                return false;
+                if (string.IsNullOrWhiteSpace(SenhaCuidador) || string.IsNullOrWhiteSpace(ConfirmacaoSenhaCuidador))
+                {
+                    await _dialogService.DisplayAlert("Campo Obrigatório", "Por favor, preencha a senha e a confirmação de senha.", "OK");
+                    return false;
+                }
             }
-            if (SenhaCuidador != ConfirmacaoSenhaCuidador)
+
+            if (!string.IsNullOrWhiteSpace(SenhaCuidador) || !string.IsNullOrWhiteSpace(ConfirmacaoSenhaCuidador))
             {
-                await _dialogService.DisplayAlert("Senhas Diferem", "A senha informada e a confirmação não coincidem. Verifique e tente novamente.", "OK");
-                return false;
+                if (SenhaCuidador != ConfirmacaoSenhaCuidador)
+                {
+                    await _dialogService.DisplayAlert("Senhas Diferem", "A senha informada e a confirmação não coincidem. Verifique e tente novamente.", "OK");
+                    return false;
+                }
             }
 
             return true;

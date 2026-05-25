@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IngestaoMed.Core.Interfaces;
-using IngestaoMed.Core.Services;
 using System.Threading.Tasks;
 
 namespace IngestaoMed.Core.ViewModels
@@ -29,7 +28,7 @@ namespace IngestaoMed.Core.ViewModels
         [RelayCommand]
         private async Task NavegarParaPaciente()
         {
-            await _navigationService.GoToAsync("paciente/PacientesPage");
+            await _navigationService.GoToAsync("PacientesPage");
         }
 
         [RelayCommand]
@@ -63,7 +62,7 @@ namespace IngestaoMed.Core.ViewModels
 
             if (sucesso)
             {
-                await _navigationService.GoToAsync("ListaPacientesPage");
+                await _navigationService.GoToAsync("//ListaPacientesPage");
             }
             else
             {

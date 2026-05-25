@@ -23,5 +23,8 @@ namespace IngestaoMed.Core.Models
         public required string Email { get; set; }
         [MaxLength(255), NotNull]
         public required string PasswordHash { get; set; }
+
+        [MaxLength(20)]
+        public int LimiteSonecasParaAlerta { get; set; } = 3;
     }
 }

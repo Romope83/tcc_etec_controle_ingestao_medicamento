@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using IngestaoMed.Core.Data;
 using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Models;
 using System;
@@ -13,21 +12,24 @@ namespace IngestaoMed.Core.ViewModels
 {
     public partial class AgendamentoViewModel : ObservableObject
     {
-        private readonly IDatabaseContext _db;
         private readonly INavigationService _navigation;
         private readonly IDialogService _dialogService;
         private readonly IAgendamentoConflitoService _conflitoService;
+        private readonly IAgendamentoService _agendamentoService;
+        private readonly ITratamentoService _tratamentoService;
 
         public AgendamentoViewModel(
-            IDatabaseContext db,
             INavigationService navigation,
             IDialogService dialogService,
-            IAgendamentoConflitoService conflitoService)
+            IAgendamentoConflitoService @conflitoService,
+            IAgendamentoService agendamentoService,
+            ITratamentoService tratamentoService)
         {
-            _db = db;
             _navigation = navigation;
             _dialogService = dialogService;
-            _conflitoService = conflitoService;
+            _conflitoService = @conflitoService;
+            _agendamentoService = agendamentoService;
+            _tratamentoService = tratamentoService;
         }
 
         [ObservableProperty] private int _tratamentoId;
@@ -36,7 +38,6 @@ namespace IngestaoMed.Core.ViewModels
         [ObservableProperty] private bool _temMedicamentoSelecionado;
         [ObservableProperty] private string _textoBusca = string.Empty;
 
-        // Estados de Controle da Tela
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(PodeDeletarDoses))]
         private bool _estaEditando;
@@ -55,6 +56,8 @@ namespace IngestaoMed.Core.ViewModels
         [ObservableProperty] private TimeSpan _horaFim = new TimeSpan(23, 59, 0);
         [ObservableProperty] private bool _ativado = true;
         [ObservableProperty] private int _tolerancia = 30;
+        [ObservableProperty] private bool _ehTempoEmHoras = false;
+
 
         public ObservableCollection<Medicamento> SugestoesBusca { get; } = new();
         private List<Medicamento> _listaOriginal = new();
@@ -69,23 +72,25 @@ namespace IngestaoMed.Core.ViewModels
             }
         }
 
-        // Método de entrada ajustado para gerenciar tanto a criação quanto a edição histórica
         public async Task InicializarAsync(int tratamentoId, int medicamentoTratamentoId = 0)
         {
             TratamentoId = tratamentoId;
             MedicamentoTratamentoId = medicamentoTratamentoId;
+            var tratamento = await _agendamentoService.ObterTratamentoPorIdAsync(tratamentoId);
+            //var medtrat = await _tratamentoService.ObterMedicamentoTratamentoPorIdAsync(medicamentoTratamentoId);
+            //if (tratamento == null) return;
 
             if (medicamentoTratamentoId > 0)
             {
-                // MODO EDICAO: Carrega as doses e o medicamento do agendamento salvo
-                var vinculo = await _db.BuscarPrimeiroAsync<MedicamentoTratamento>(mt => mt.Id == medicamentoTratamentoId);
+                PossuiDosesGeradas = true;
+                var vinculo = await _agendamentoService.ObterVinculoPorIdAsync(medicamentoTratamentoId);
                 if (vinculo != null)
                 {
                     Dose = vinculo.Dosagem ?? string.Empty;
                     IntervaloHoras = vinculo.IntervaloHoras;
                     Ativado = vinculo.Ativo;
 
-                    var med = await _db.BuscarPrimeiroAsync<Medicamento>(m => m.Id == vinculo.MedicamentoId);
+                    var med = await _agendamentoService.ObterMedicamentoPorIdAsync(vinculo.MedicamentoId);
                     if (med != null)
                     {
                         MedicamentoSelecionado = med;
@@ -93,13 +98,11 @@ namespace IngestaoMed.Core.ViewModels
                         TextoBusca = med.NomeComercial ?? string.Empty;
                     }
 
-                    // Recupera e exibe as doses existentes gravadas no banco
-                    var dosesSalvas = await _db.BuscarOndeAsync<Agendamento>(a => a.MedicamentoTratamentoId == medicamentoTratamentoId);
+                    var dosesSalvas = await _agendamentoService.ObterDosesPorVinculoIdAsync(medicamentoTratamentoId);
 
                     DosesGeradas.Clear();
                     if (dosesSalvas.Any())
                     {
-                        // Organiza a linha cronológica e recupera os marcos de início/fim
                         var dosesOrdenadas = dosesSalvas.OrderBy(a => a.HorarioOriginal).ToList();
 
                         DataInicio = dosesOrdenadas.First().HorarioOriginal.Date;
@@ -107,25 +110,43 @@ namespace IngestaoMed.Core.ViewModels
                         DataFim = dosesOrdenadas.Last().HorarioOriginal.Date;
                         HoraFim = dosesOrdenadas.Last().HorarioOriginal.TimeOfDay;
 
+                        var toleranciaTimespan = TimeSpan.FromMinutes(Tolerancia);
+
+                        DateTime agora = DateTime.Now;
                         foreach (var dose in dosesOrdenadas)
                         {
+                            if (dose.Status == "Pendente" && agora > dose.ProximoAlarme.Add(toleranciaTimespan))
+                            {
+                                
+
+                                dose.Atrasado = true;
+                            }
+                            else
+                            {
+                                dose.Atrasado = false;
+                            }
                             DosesGeradas.Add(dose);
                         }
 
                         PossuiDosesGeradas = true;
                         EstaEditando = true;
                     }
+                    else
+                    {
+                        PossuiDosesGeradas = false;
+                    }
                 }
             }
             else
             {
-                // MODO CADASTRO: Inicializa a tela em estado limpo para nova configuração
                 MedicamentoSelecionado = null;
                 TemMedicamentoSelecionado = false;
                 TextoBusca = string.Empty;
                 Dose = string.Empty;
                 PossuiDosesGeradas = false;
                 EstaEditando = false;
+                DataFim = tratamento.DataFim ??DateTime.Now.AddDays(1);
+                
                 DosesGeradas.Clear();
 
                 await CarregarTodosMedicamentosAsync();
@@ -134,7 +155,7 @@ namespace IngestaoMed.Core.ViewModels
 
         private async Task CarregarTodosMedicamentosAsync()
         {
-            _listaOriginal = await _db.BuscarTodosAsync<Medicamento>();
+            _listaOriginal = await _agendamentoService.ObterTodosMedicamentosAsync();
             AtualizarSugestoes(_listaOriginal);
         }
 
@@ -148,7 +169,7 @@ namespace IngestaoMed.Core.ViewModels
             TextoBusca = string.Empty;
             SugestoesBusca.Clear();
             DosesGeradas.Clear();
-            CarregarTodosMedicamentosAsync();
+            _ = CarregarTodosMedicamentosAsync();
         }
 
         [RelayCommand]
@@ -200,7 +221,10 @@ namespace IngestaoMed.Core.ViewModels
                     HorarioConfirmacao = null
                 });
 
-                atual = atual.AddHours(IntervaloHoras);
+                atual = EhTempoEmHoras
+                        ? atual.AddHours(IntervaloHoras)
+                        : atual.AddMinutes(IntervaloHoras);
+
             }
         }
 
@@ -209,14 +233,13 @@ namespace IngestaoMed.Core.ViewModels
         {
             if (!PodeDeletarDoses) return;
 
-            foreach (var dose in DosesGeradas.ToList())
+            bool sucesso = await _agendamentoService.DeletarDosesEAlarmeAsync(DosesGeradas.ToList());
+            if (sucesso)
             {
-                if (dose.Id > 0) await _db.ExcluirAsync(dose);
-                DosesGeradas.Remove(dose);
+                DosesGeradas.Clear();
+                PossuiDosesGeradas = false;
+                EstaEditando = false;
             }
-
-            PossuiDosesGeradas = false;
-            EstaEditando = false;
         }
 
         [RelayCommand]
@@ -224,8 +247,7 @@ namespace IngestaoMed.Core.ViewModels
         {
             if (MedicamentoSelecionado == null) return;
 
-            // 1. Resgata o Objeto Tratamento para coletar o PacienteId necessário para o serviço
-            var tratamentoAtual = await _db.BuscarPrimeiroAsync<Tratamento>(t => t.Id == TratamentoId);
+            var tratamentoAtual = await _agendamentoService.ObterTratamentoPorIdAsync(TratamentoId);
             if (tratamentoAtual == null)
             {
                 await _dialogService.DisplayAlert("Erro", "Tratamento de origem não encontrado.", "OK");
@@ -246,7 +268,6 @@ namespace IngestaoMed.Core.ViewModels
                 return;
             }
 
-            // 2. Monta uma lista temporária dos horários que serão criados
             var novosHorarios = new List<DateTime>();
             DateTime atual = DataInicio.Date.Add(HoraInicio);
             DateTime fim = DataFim.Date.Add(HoraFim);
@@ -257,7 +278,6 @@ namespace IngestaoMed.Core.ViewModels
                 atual = atual.AddHours(IntervaloHoras);
             }
 
-            // 3. Executa a checagem usando o serviço de conflito (Apenas valida novos registros)
             if (MedicamentoTratamentoId == 0)
             {
                 var conflitos = await _conflitoService.VerificarConflitosAsync(tratamentoAtual, novosHorarios);
@@ -273,44 +293,33 @@ namespace IngestaoMed.Core.ViewModels
                 }
             }
 
-            // 4. Efetivação dos dados no banco de dados
             if (MedicamentoTratamentoId == 0)
             {
-                // Salva um novo vínculo
-                var mt = new MedicamentoTratamento
-                {
-                    TratamentoId = TratamentoId,
-                    MedicamentoId = MedicamentoSelecionado.Id,
-                    Dosagem = Dose,
-                    IntervaloHoras = IntervaloHoras,
-                    Ativo = Ativado
-                };
-
-                await _db.InserirAsync(mt);
-                MedicamentoTratamentoId = mt.Id;
-
                 GerarDoses();
-                foreach (var dose in DosesGeradas)
-                {
-                    dose.MedicamentoTratamentoId = mt.Id;
-                    await _db.InserirAsync(dose);
-                }
+                bool salvo = await _agendamentoService.SalvarNovoAgendamentoAsync(
+                    TratamentoId,
+                    MedicamentoSelecionado,
+                    Dose,
+                    IntervaloHoras,
+                    Ativado,
+                    DosesGeradas.ToList()
+                );
+                if (!salvo) return;
             }
             else
             {
-                // Atualiza o vínculo existente
-                var mt = await _db.BuscarPrimeiroAsync<MedicamentoTratamento>(x => x.Id == MedicamentoTratamentoId);
-                if (mt != null)
-                {
-                    mt.Dosagem = Dose;
-                    mt.IntervaloHoras = IntervaloHoras;
-                    mt.Ativo = Ativado;
-                    await _db.AtualizarAsync(mt);
-                }
+                bool atualizado = await _agendamentoService.AtualizarAgendamentoExistenteAsync(
+                    MedicamentoTratamentoId,
+                    Dose,
+                    IntervaloHoras,
+                    Ativado
+                );
+                if (!atualizado) return;
             }
 
             PossuiDosesGeradas = true;
             EstaEditando = true;
+
 
             OnPropertyChanged(nameof(PodeDeletarDoses));
         }

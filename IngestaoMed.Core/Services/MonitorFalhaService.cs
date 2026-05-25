@@ -15,37 +15,39 @@ namespace IngestaoMed.Core.Services
 
         public async Task VerificarELoggerFalhaAsync(int agendamentoId, int totalSonecas)
         {
-            var config = await _db.BuscarPrimeiroAsync<ConfiguracaoCuidador>();
-            if (config == null || !config.AlertaAtivado) return;
+            var cuidador = await _db.BuscarPrimeiroAsync<Cuidador>();
+            if (cuidador == null) return;
 
-            if (totalSonecas >= config.LimiteSonecasParaAlerta)
+            if (totalSonecas >= cuidador.LimiteSonecasParaAlerta)
             {
-                // 1. Busca o agendamento específico
                 var agendamento = await _db.BuscarPrimeiroAsync<Agendamento>(a => a.Id == agendamentoId);
                 if (agendamento == null) return;
 
-                // 2. Busca o vínculo do medicamento dentro do tratamento
                 var vinculo = await _db.BuscarPrimeiroAsync<MedicamentoTratamento>(m => m.Id == agendamento.MedicamentoTratamentoId);
                 if (vinculo == null) return;
 
-                // 3. Busca o nome comercial na tabela de Medicamentos
+                var tratamento = await _db.BuscarPrimeiroAsync<Tratamento>(t => t.Id == vinculo.TratamentoId);
+                if (tratamento == null) return;
+
+                var paciente = await _db.BuscarPrimeiroAsync<Paciente>(p=>p.Id == tratamento.PacienteId);
+                if (paciente == null) return;
+
                 var medicamento = await _db.BuscarPrimeiroAsync<Medicamento>(m => m.Id == vinculo.MedicamentoId);
 
                 string nomeRemedio = medicamento?.NomeComercial ?? "Medicamento não identificado";
 
-                // 4. Monta o e-mail focado no remédio específico
                 var emailParaFila = new EmailFila
                 {
-                    Destinatario = config.EmailCuidador,
+                    Destinatario = cuidador.Email,
                     Assunto = $"⚠️ ALERTA: Falha no medicamento {nomeRemedio}",
-                    Corpo = $@"Olá {config.NomeCuidador},
+                    Corpo = $@"Olá {cuidador.Nome},
 
-O paciente não confirmou a ingestão do seguinte remédio:
+O paciente {paciente.Nome}, nascido em {paciente.DataNascimento:dd/MM/yyyy}, não confirmou a ingestão do medicamento agendado para as {agendamento.HorarioOriginal:HH:mm}.
 Medicamento: {nomeRemedio}
 Dosagem: {vinculo.Dosagem}
 Instruções: {vinculo.Instrucoes}
 
-Este remédio faz parte do tratamento: {agendamento.Tratamento?.Nome ?? "N/A"}.
+Este remédio faz parte do tratamento: {tratamento.Nome ?? "N/A"}.
 
 O limite de {totalSonecas} sonecas foi atingido. Por favor, verifique o paciente.",
                     DataCriacao = DateTime.Now,
@@ -53,6 +55,7 @@ O limite de {totalSonecas} sonecas foi atingido. Por favor, verifique o paciente
                 };
 
                 await _db.InserirAsync(emailParaFila);
+                agendamento.Status = "Perdido";
             }
         }
     }

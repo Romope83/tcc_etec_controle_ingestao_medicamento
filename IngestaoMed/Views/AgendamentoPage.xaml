@@ -9,6 +9,67 @@
              Shell.NavBarIsVisible="False"
              BackgroundColor="#F8F9FA">
 
+    <ContentPage.Resources>
+        <Style TargetType="Entry">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="#333333" />
+                                <Setter Property="BackgroundColor" Value="#F0F0F0" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="Black" />
+                                <Setter Property="BackgroundColor" Value="White" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="#333333" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="Black" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TimePicker">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="#333333" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="Black" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
@@ -62,7 +123,7 @@
                             <Border Padding="10" StrokeShape="RoundRectangle 15" BackgroundColor="White" StrokeThickness="0">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AgendamentoViewModel}}, Path=SelecionarMedicamentoCommand}" 
-                                                           CommandParameter="{Binding .}" />
+                                                          CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="Auto, *" ColumnSpacing="15">
                                     <Border Grid.Column="0" WidthRequest="50" HeightRequest="50" StrokeShape="RoundRectangle 25" StrokeThickness="0">
@@ -126,19 +187,33 @@
                                    TextColor="Gray" 
                                    IsVisible="{Binding TemMedicamentoSelecionado}" />
                         </HorizontalStackLayout>
-
                         <Entry Text="{Binding Dose}" Placeholder="Ex: 2" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="5">
-                        <Label Text="Intervalo (horas)" TextColor="Gray" />
+                        <Label Text="Intervalo (horas/minutos)" TextColor="Gray" />
                         <Entry Text="{Binding IntervaloHoras}" Keyboard="Numeric" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="5">
+                        <HorizontalStackLayout Spacing="15" Margin="0,0,0,5">
+                            <RadioButton Content="Minutos" 
+                                         GroupName="UnidadeTempo" 
+                                         IsChecked="{Binding EhTempoEmHoras, Converter={toolkit:InvertedBoolConverter}}" />
+                            <RadioButton Content="Horas" 
+                                         GroupName="UnidadeTempo" 
+                                         IsChecked="{Binding EhTempoEmHoras}" />
+                        </HorizontalStackLayout>
+
                         <HorizontalStackLayout Spacing="5">
                             <Label Text="Tolerância de Atraso:" TextColor="Gray" />
-                            <Label Text="{Binding Tolerancia, StringFormat='{0} minutos'}" TextColor="{StaticResource Primary}" FontAttributes="Bold" />
+                            <Label Text="{Binding Tolerancia, StringFormat='{0} minutos'}" TextColor="{StaticResource Primary}" FontAttributes="Bold">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding EhTempoEmHoras}" Value="True">
+                                        <Setter Property="Text" Value="{Binding Tolerancia, StringFormat='{0} horas'}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
                         </HorizontalStackLayout>
 
                         <Slider Minimum="0" 
@@ -157,7 +232,6 @@
                             <DatePicker Date="{Binding DataInicio}" 
                                         Format="dd/MM/yyyy" 
                                         VerticalOptions="Center" />
-
                             <TimePicker Grid.Column="1" 
                                         Time="{Binding HoraInicio}" 
                                         Format="HH:mm" 
@@ -170,7 +244,6 @@
                             <DatePicker Date="{Binding DataFim}" 
                                         Format="dd/MM/yyyy" 
                                         VerticalOptions="Center" />
-
                             <TimePicker Grid.Column="1" 
                                         Time="{Binding HoraFim}" 
                                         Format="HH:mm" 
@@ -184,22 +257,41 @@
                         IsVisible="{Binding PossuiDosesGeradas, Converter={toolkit:InvertedBoolConverter}}"
                         BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="10" HeightRequest="45" />
 
-                <Border Stroke="#9575CD" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="15" BackgroundColor="#FDF0F0"
+                <Border Stroke="{StaticResource Secondary}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="15" BackgroundColor="{StaticResource Secondary}"
                         IsVisible="{Binding PossuiDosesGeradas}">
                     <VerticalStackLayout Spacing="10">
                         <Grid ColumnDefinitions="*, Auto">
-                            <Label Text="DOSES PREVISTAS" FontAttributes="Bold" TextColor="#7E57C2" VerticalOptions="Center" />
+                            <Label Text="DOSES PREVISTAS" FontAttributes="Bold" TextColor="White" VerticalOptions="Center" />
                             <Button Grid.Column="1" Text="🗑️" Command="{Binding DeletarDosesCommand}" IsVisible="{Binding PodeDeletarDoses}"
-                                    BackgroundColor="Transparent" TextColor="Red" FontSize="20" />
+                                    BackgroundColor="Transparent" TextColor="White" FontSize="20" />
                         </Grid>
 
                         <VerticalStackLayout BindableLayout.ItemsSource="{Binding DosesGeradas}" Spacing="5">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="models:Agendamento">
-                                    <Border Stroke="#9575CD" StrokeThickness="0.5" Padding="10" BackgroundColor="White" StrokeShape="RoundRectangle 10">
+                                    <Border Stroke="LightGray" StrokeThickness="0.5" Padding="10" BackgroundColor="White" StrokeShape="RoundRectangle 10">
                                         <Grid ColumnDefinitions="*, Auto">
-                                            <Label Text="{Binding HorarioOriginal, StringFormat='{0:dd/MM/yyyy HH:mm}'}" VerticalOptions="Center" />
-                                            <Label Grid.Column="1" Text="{Binding Status}" TextColor="Red" FontAttributes="Bold" VerticalOptions="Center" />
+                                            <Label Text="{Binding ProximoAlarme, StringFormat='{0:dd/MM/yyyy HH:mm}'}" 
+                                                   VerticalOptions="Center" 
+                                                   TextColor="#333333" />
+
+                                            <Label Grid.Column="1" 
+                                                   FontAttributes="Bold" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2196F3" 
+                                                   Text="⏳ Pendente">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding Status}" Value="Tomado">
+                                                        <Setter Property="TextColor" Value="Green" />
+                                                        <Setter Property="Text" Value="✅ Tomado" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger TargetType="Label" Binding="{Binding Atrasado}" Value="True">
+                                                        <Setter Property="TextColor" Value="Red" />
+                                                        <Setter Property="Text" Value="❌ Perdido" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

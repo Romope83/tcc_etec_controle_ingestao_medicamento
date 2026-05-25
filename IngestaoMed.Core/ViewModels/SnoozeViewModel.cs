@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using IngestaoMed.Core.Constants;
 using IngestaoMed.Core.Interfaces;
+using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace IngestaoMed.Core.ViewModels
@@ -11,6 +13,9 @@ namespace IngestaoMed.Core.ViewModels
     {
         private readonly ISnoozeService _snoozeService;
         private readonly ISnoozeScheduler _snoozeScheduler;
+        private readonly IMonitorFalhaService _monitorFalhaService;
+
+        private int _agendamentoId;
 
         [ObservableProperty]
         private string _tempoRestante = "00:00";
@@ -24,32 +29,49 @@ namespace IngestaoMed.Core.ViewModels
         [ObservableProperty]
         private string _nomeMedicamento = string.Empty;
 
-        public SnoozeViewModel(ISnoozeService snoozeService, ISnoozeScheduler snoozeScheduler)
+        public SnoozeViewModel(
+            ISnoozeService snoozeService,
+            ISnoozeScheduler snoozeScheduler,
+            IMonitorFalhaService monitorFalhaService)
         {
             _snoozeService = snoozeService;
             _snoozeScheduler = snoozeScheduler;
+            _monitorFalhaService = monitorFalhaService;
+
             WeakReferenceMessenger.Default.Register<string>(this, (r, tempo) =>
             {
                 TempoRestante = tempo;
             });
+
+            WeakReferenceMessenger.Default.Register<string, string>(this, "SnoozeFinished", async (r, token) =>
+            {
+                await TratarTempoExpiradoAsync();
+            });
         }
 
-        public void Inicializar(int agendamentoId, string nomeMed, DateTime alvo)
+        public void Inicializar(int agendamentoId, string nomeMed)
         {
+            _agendamentoId = agendamentoId;
             NomeMedicamento = nomeMed;
             QuantidadeSonecas = _snoozeScheduler.ObterTentativas(agendamentoId);
             PodeAdiarNovamente = _snoozeScheduler.PodeAdiar(agendamentoId);
-
-            // Aqui você conectará o SnoozeTimerHelper (que está no MAUI) 
-            // através de um evento ou mensagem se necessário.
         }
 
         [RelayCommand]
-        private async Task ConfirmarIngestao(int agendamentoId)
+        private async Task ConfirmarIngestao()
         {
-            _snoozeService.CancelarSoneca(agendamentoId);
-            // Lógica para marcar como tomado no banco...
+            _snoozeScheduler.LimparHistorico(_agendamentoId);
+
             await Task.CompletedTask;
+        }
+
+        private async Task TratarTempoExpiradoAsync()
+        {
+            if (!_snoozeScheduler.PodeAdiar(_agendamentoId))
+            {
+                int totalSonecas = _snoozeScheduler.ObterTentativas(_agendamentoId);
+                await _monitorFalhaService.VerificarELoggerFalhaAsync(_agendamentoId, totalSonecas);
+            }
         }
     }
 }

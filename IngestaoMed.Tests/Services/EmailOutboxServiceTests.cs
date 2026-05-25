@@ -3,7 +3,11 @@ using Xunit;
 using IngestaoMed.Core.Services;
 using IngestaoMed.Core.Models;
 using IngestaoMed.Core.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace IngestaoMed.Tests.Services
 {
@@ -26,9 +30,9 @@ namespace IngestaoMed.Tests.Services
             // Arrange
             var lista = new List<EmailFila>
             {
-                new EmailFila { Id = 1, Enviado = false, Tentativas = 0 }, // Deve retornar
-                new EmailFila { Id = 2, Enviado = true, Tentativas = 1 },  // Já enviado (pula)
-                new EmailFila { Id = 3, Enviado = false, Tentativas = 3 }  // Limite atingido (pula)
+                new EmailFila { Id = 1, Enviado = false, Tentativas = 0 },
+                new EmailFila { Id = 2, Enviado = true, Tentativas = 1 },
+                new EmailFila { Id = 3, Enviado = false, Tentativas = 3 }
             };
             _dbMock.Setup(d => d.BuscarTodosAsync<EmailFila>()).ReturnsAsync(lista);
 
@@ -38,6 +42,19 @@ namespace IngestaoMed.Tests.Services
             // Assert
             Assert.Single(resultado);
             Assert.Equal(1, resultado[0].Id);
+        }
+
+        [Fact]
+        public async Task ObterPendentes_QuandoFilaEstiverVazia_DeveRetornarListaVazia()
+        {
+            // Arrange
+            _dbMock.Setup(d => d.BuscarTodosAsync<EmailFila>()).ReturnsAsync(new List<EmailFila>());
+
+            // Act
+            var resultado = await _service.ObterPendentesAsync();
+
+            // Assert
+            Assert.Empty(resultado);
         }
 
         #endregion
@@ -99,9 +116,9 @@ namespace IngestaoMed.Tests.Services
             var hoje = DateTime.Now;
             var lista = new List<EmailFila>
             {
-                new EmailFila { Id = 1, Enviado = true, DataCriacao = hoje.AddDays(-10) }, // Deve excluir
-                new EmailFila { Id = 2, Enviado = true, DataCriacao = hoje.AddDays(-2) },  // Enviado mas recente (fica)
-                new EmailFila { Id = 3, Enviado = false, DataCriacao = hoje.AddDays(-10) } // Antigo mas NÃO enviado (fica)
+                new EmailFila { Id = 1, Enviado = true, DataCriacao = hoje.AddDays(-10) },
+                new EmailFila { Id = 2, Enviado = true, DataCriacao = hoje.AddDays(-2) },
+                new EmailFila { Id = 3, Enviado = false, DataCriacao = hoje.AddDays(-10) }
             };
             _dbMock.Setup(d => d.BuscarTodosAsync<EmailFila>()).ReturnsAsync(lista);
 
@@ -112,6 +129,25 @@ namespace IngestaoMed.Tests.Services
             _dbMock.Verify(d => d.ExcluirAsync(It.Is<EmailFila>(e => e.Id == 1)), Times.Once);
             _dbMock.Verify(d => d.ExcluirAsync(It.Is<EmailFila>(e => e.Id == 2)), Times.Never);
             _dbMock.Verify(d => d.ExcluirAsync(It.Is<EmailFila>(e => e.Id == 3)), Times.Never);
+        }
+
+        [Fact]
+        public async Task LimparFila_QuandoNaoHouverEmailsAntigos_NaoDeveExcluirNenhumRegistro()
+        {
+            // Arrange
+            var hoje = DateTime.Now;
+            var lista = new List<EmailFila>
+            {
+                new EmailFila { Id = 1, Enviado = true, DataCriacao = hoje.AddDays(-5) },
+                new EmailFila { Id = 2, Enviado = false, DataCriacao = hoje.AddDays(-12) }
+            };
+            _dbMock.Setup(d => d.BuscarTodosAsync<EmailFila>()).ReturnsAsync(lista);
+
+            // Act
+            await _service.LimparFilaAntigaAsync(7);
+
+            // Assert
+            _dbMock.Verify(d => d.ExcluirAsync(It.IsAny<EmailFila>()), Times.Never);
         }
 
         #endregion

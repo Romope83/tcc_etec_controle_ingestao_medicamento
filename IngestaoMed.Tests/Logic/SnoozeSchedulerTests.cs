@@ -1,7 +1,7 @@
 ﻿using IngestaoMed.Core.Services;
 using Xunit;
 
-namespace IngestaoMed.Tests.Services
+namespace IngestaoMed.Tests.Logic
 {
     public class SnoozeSchedulerTests
     {

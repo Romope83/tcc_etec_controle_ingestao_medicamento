@@ -69,11 +69,24 @@ namespace IngestaoMed.Core.Services
 
         public async Task<int> ExcluirTratamentoAsync(Tratamento tratamento)
         {
+            var vinculos = await _db.BuscarOndeAsync<MedicamentoTratamento>(v => v.TratamentoId == tratamento.Id);
+
+            foreach (var vinculo in vinculos)
+            {
+                await ExcluirMedicamentoTratamentoAsync(vinculo);
+            }
             return await _db.ExcluirAsync(tratamento);
         }
 
         public async Task<int> ExcluirMedicamentoTratamentoAsync(MedicamentoTratamento vinculo)
         {
+            var agendamentos = await _db.BuscarOndeAsync<Agendamento>(a => a.MedicamentoTratamentoId == vinculo.Id);
+
+            foreach (var agendamento in agendamentos)
+            {
+                await _db.ExcluirAsync(agendamento);
+            }
+
             return await _db.ExcluirAsync(vinculo);
         }
         public async Task<List<MedicamentoTratamento>> ObterOndeMedicamentoVinculadoAsync(Expression<Func<MedicamentoTratamento, bool>> predicado)

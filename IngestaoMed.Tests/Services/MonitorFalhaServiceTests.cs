@@ -1,9 +1,12 @@
 ﻿using Moq;
 using Xunit;
 using IngestaoMed.Core.Services;
-using IngestaoMed.Core.Models;
+using IngestaoMed.Core.Interfaces;
 using IngestaoMed.Core.Data;
+using IngestaoMed.Core.Models;
+using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace IngestaoMed.Tests.Services
 {
@@ -18,69 +21,156 @@ namespace IngestaoMed.Tests.Services
             _service = new MonitorFalhaService(_dbMock.Object);
         }
 
-        // --- CAMINHOS FELIZES ---
+        #region VerificarELoggerFalhaAsync Tests
 
         [Fact]
-        public async Task VerificarFalha_AbaixoDoLimite_NaoDeveEnfileirarEmail()
+        public async Task VerificarELoggerFalhaAsync_ConfiguracaoNaoEncontrada_DeveEncerrarSemCriarAlerta()
+        {
+            // Arrange
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>())
+                   .ReturnsAsync((ConfiguracaoCuidador?)null);
+
+            // Act
+            await _service.VerificarELoggerFalhaAsync(agendamentoId: 1, totalSonecas: 5);
+
+            // Assert
+            _dbMock.Verify(d => d.InserirAsync(It.IsAny<EmailFila>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task VerificarELoggerFalhaAsync_AlertaDesativadoNaConfiguracao_DeveEncerrarSemCriarAlerta()
+        {
+            // Arrange
+            var config = new ConfiguracaoCuidador { AlertaAtivado = false, LimiteSonecasParaAlerta = 3 };
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>())
+                   .ReturnsAsync(config);
+
+            // Act
+            await _service.VerificarELoggerFalhaAsync(agendamentoId: 1, totalSonecas: 5);
+
+            // Assert
+            _dbMock.Verify(d => d.InserirAsync(It.IsAny<EmailFila>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task VerificarELoggerFalhaAsync_TotalSonecasMenorQueOLimiteConfigurado_DeveEncerrarSemCriarAlerta()
         {
             // Arrange
             var config = new ConfiguracaoCuidador { AlertaAtivado = true, LimiteSonecasParaAlerta = 3 };
-            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>(It.IsAny<Expression<Func<ConfiguracaoCuidador, bool>>>()))
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>())
                    .ReturnsAsync(config);
 
-            // Act: 2 sonecas, mas o limite é 3
-            await _service.VerificarELoggerFalhaAsync(1, 2);
+            // Act
+            await _service.VerificarELoggerFalhaAsync(agendamentoId: 1, totalSonecas: 2);
 
             // Assert
             _dbMock.Verify(d => d.InserirAsync(It.IsAny<EmailFila>()), Times.Never);
         }
 
         [Fact]
-        public async Task VerificarFalha_AlertaDesativado_NaoDeveEnfileirarEmail()
+        public async Task VerificarELoggerFalhaAsync_AgendamentoNaoEncontrado_DeveEncerrarSemCriarAlerta()
         {
             // Arrange
-            var config = new ConfiguracaoCuidador { AlertaAtivado = false, LimiteSonecasParaAlerta = 1 };
-            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>(It.IsAny<Expression<Func<ConfiguracaoCuidador, bool>>>()))
+            var config = new ConfiguracaoCuidador { AlertaAtivado = true, LimiteSonecasParaAlerta = 3 };
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>())
                    .ReturnsAsync(config);
 
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<Agendamento, bool>>>()))
+                   .ReturnsAsync((Agendamento?)null);
+
             // Act
-            await _service.VerificarELoggerFalhaAsync(1, 1);
+            await _service.VerificarELoggerFalhaAsync(agendamentoId: 99, totalSonecas: 3);
 
             // Assert
             _dbMock.Verify(d => d.InserirAsync(It.IsAny<EmailFila>()), Times.Never);
         }
 
         [Fact]
-        public async Task VerificarFalha_AgendamentoInexistente_DeveEncerrarSemErro()
+        public async Task VerificarELoggerFalhaAsync_VinculoMedicamentoTratamentoNaoEncontrado_DeveEncerrarSemCriarAlerta()
         {
             // Arrange
-            var config = new ConfiguracaoCuidador { AlertaAtivado = true, LimiteSonecasParaAlerta = 1 };
-            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>(It.IsAny<Expression<Func<ConfiguracaoCuidador, bool>>>()))
+            var config = new ConfiguracaoCuidador { AlertaAtivado = true, LimiteSonecasParaAlerta = 3 };
+            var agendamento = new Agendamento { Id = 1, MedicamentoTratamentoId = 10 };
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>())
                    .ReturnsAsync(config);
 
-            // Simula agendamento não encontrado no banco
-            _dbMock.Setup(d => d.BuscarPrimeiroAsync<Agendamento>(It.IsAny<Expression<Func<Agendamento, bool>>>()))
-                   .ReturnsAsync((Agendamento)null!);
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<Agendamento, bool>>>()))
+                   .ReturnsAsync(agendamento);
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<MedicamentoTratamento, bool>>>()))
+                   .ReturnsAsync((MedicamentoTratamento?)null);
 
             // Act
-            await _service.VerificarELoggerFalhaAsync(99, 1);
+            await _service.VerificarELoggerFalhaAsync(agendamentoId: 1, totalSonecas: 3);
 
             // Assert
             _dbMock.Verify(d => d.InserirAsync(It.IsAny<EmailFila>()), Times.Never);
         }
 
         [Fact]
-        public async Task VerificarFalha_SemConfiguracao_DeveEncerrarSilenciosamente()
+        public async Task VerificarELoggerFalhaAsync_TodosDadosValidosEMedicamentoNaoIdentificado_DeveInserirEmailComNomeAlternativoNaFila()
         {
             // Arrange
-            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>(It.IsAny<Expression<Func<ConfiguracaoCuidador, bool>>>()))
-                   .ReturnsAsync((ConfiguracaoCuidador)null!);
+            var config = new ConfiguracaoCuidador { AlertaAtivado = true, LimiteSonecasParaAlerta = 3, EmailCuidador = "cuidador@teste.com", NomeCuidador = "Carlos" };
+            var agendamento = new Agendamento { Id = 1, MedicamentoTratamentoId = 10 };
+            var vinculo = new MedicamentoTratamento { Id = 10, MedicamentoId = 100, Dosagem = "1 comprimido", Instrucoes = "Após o almoço" };
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>())
+                   .ReturnsAsync(config);
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<Agendamento, bool>>>()))
+                   .ReturnsAsync(agendamento);
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<MedicamentoTratamento, bool>>>()))
+                   .ReturnsAsync(vinculo);
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<Medicamento, bool>>>()))
+                   .ReturnsAsync((Medicamento?)null);
 
             // Act
-            await _service.VerificarELoggerFalhaAsync(1, 5);
+            await _service.VerificarELoggerFalhaAsync(agendamentoId: 1, totalSonecas: 3);
 
             // Assert
-            _dbMock.Verify(d => d.InserirAsync(It.IsAny<EmailFila>()), Times.Never);
+            _dbMock.Verify(d => d.InserirAsync(It.Is<EmailFila>(e =>
+                e.Destinatario == "cuidador@teste.com" &&
+                e.Assunto.Contains("Medicamento não identificado") &&
+                e.Enviado == false)), Times.Once);
         }
+
+        [Fact]
+        public async Task VerificarELoggerFalhaAsync_TodosDadosValidosEMedicamentoEncontrado_DeveInserirEmailCompletoNaFilaComSucesso()
+        {
+            // Arrange
+            var config = new ConfiguracaoCuidador { AlertaAtivado = true, LimiteSonecasParaAlerta = 3, EmailCuidador = "cuidador@teste.com", NomeCuidador = "Carlos" };
+            var agendamento = new Agendamento { Id = 1, MedicamentoTratamentoId = 10 };
+            var vinculo = new MedicamentoTratamento { Id = 10, MedicamentoId = 100, Dosagem = "1 comprimido", Instrucoes = "Após o almoço" };
+            var medicamento = new Medicamento { Id = 100, NomeComercial = "Amoxicilina" };
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync<ConfiguracaoCuidador>())
+                   .ReturnsAsync(config);
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<Agendamento, bool>>>()))
+                   .ReturnsAsync(agendamento);
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<MedicamentoTratamento, bool>>>()))
+                   .ReturnsAsync(vinculo);
+
+            _dbMock.Setup(d => d.BuscarPrimeiroAsync(It.IsAny<Expression<Func<Medicamento, bool>>>()))
+                   .ReturnsAsync(medicamento);
+
+            // Act
+            await _service.VerificarELoggerFalhaAsync(agendamentoId: 1, totalSonecas: 4);
+
+            // Assert
+            _dbMock.Verify(d => d.InserirAsync(It.Is<EmailFila>(e =>
+                e.Destinatario == "cuidador@teste.com" &&
+                e.Assunto.Contains("Amoxicilina") &&
+                e.Corpo.Contains("Amoxicilina") &&
+                e.Corpo.Contains("1 comprimido") &&
+                e.Enviado == false)), Times.Once);
+        }
+
+        #endregion
     }
 }
