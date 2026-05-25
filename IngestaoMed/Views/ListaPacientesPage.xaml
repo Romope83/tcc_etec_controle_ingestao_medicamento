@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.ListaPacientesPage"
+             x:DataType="vm:ListaPacientesViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F8F9FA">
+
+    <Grid RowDefinitions="Auto, Auto, *" Padding="20, 50, 20, 0" RowSpacing="15">
+
+        <HorizontalStackLayout Grid.Row="0" Spacing="10" HorizontalOptions="Center">
+            <HorizontalStackLayout.Resources>
+                <Style x:Key="FiltroButton" TargetType="Button">
+                    <Setter Property="CornerRadius" Value="20" />
+                    <Setter Property="HeightRequest" Value="40" />
+                    <Setter Property="Padding" Value="20,0" />
+                    <Setter Property="FontSize" Value="13" />
+                    <Setter Property="BackgroundColor" Value="White" />
+                    <Setter Property="TextColor" Value="Black" />
+                    <Setter Property="BorderWidth" Value="1" />
+                    <Setter Property="BorderColor" Value="#E0E0E0" />
+                </Style>
+            </HorizontalStackLayout.Resources>
+
+            <Button Text="Todos"
+        Style="{StaticResource FiltroButton}"
+        Command="{Binding AlterarFiltroCommand}"
+        CommandParameter="{x:Static vm:FiltroPaciente.Todos}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding FiltroAtual}" Value="{x:Static vm:FiltroPaciente.Todos}">
+                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                        <Setter Property="TextColor" Value="White" />
+                        <Setter Property="BorderWidth" Value="0" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+
+            <Button Text="Tratamento ativo"
+        Style="{StaticResource FiltroButton}"
+        Command="{Binding AlterarFiltroCommand}"
+        CommandParameter="{x:Static vm:FiltroPaciente.Ativos}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding FiltroAtual}" Value="{x:Static vm:FiltroPaciente.Ativos}">
+                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                        <Setter Property="TextColor" Value="White" />
+                        <Setter Property="BorderWidth" Value="0" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+
+            <Button Text="Idade 70+"
+        Style="{StaticResource FiltroButton}"
+        Command="{Binding AlterarFiltroCommand}"
+        CommandParameter="{x:Static vm:FiltroPaciente.Idosos}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding FiltroAtual}" Value="{x:Static vm:FiltroPaciente.Idosos}">
+                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                        <Setter Property="TextColor" Value="White" />
+                        <Setter Property="BorderWidth" Value="0" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+        </HorizontalStackLayout>
+        <Border Grid.Row="1" StrokeShape="RoundRectangle 25" StrokeThickness="0" BackgroundColor="White" Padding="10,0" HeightRequest="50">
+            <Border.Shadow>
+                <Shadow Offset="0,2" Radius="5" Opacity="0.1" Brush="Black" />
+            </Border.Shadow>
+            <Grid ColumnDefinitions="Auto, *">
+                <Label Text="🔍" VerticalOptions="Center" Margin="10,0" />
+                <Entry Grid.Column="1" 
+                       Text="{Binding TextoBusca}"
+                       Placeholder="Pesquisar..." 
+                       PlaceholderColor="Gray" 
+                       VerticalOptions="Center" 
+                       BackgroundColor="Transparent" />
+            </Grid>
+        </Border>
+
+        <CollectionView Grid.Row="2" 
+                        ItemsSource="{Binding Pacientes}"
+                        SelectionMode="None"
+                        VerticalScrollBarVisibility="Never">
+
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="20" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Spacing="10" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label Text="Sem pacientes" HorizontalTextAlignment="Center" TextColor="Gray" FontSize="18" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Paciente">
+                    <Border Margin="0,0,0,5" 
+                            Padding="15" 
+                            StrokeShape="RoundRectangle 15" 
+                            StrokeThickness="0" 
+                            BackgroundColor="White">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaPacientesViewModel}}, Path=SelecionarPacienteCommand}"
+                                CommandParameter="{Binding Id}" />
+                        </Border.GestureRecognizers>
+                        <Border.Shadow>
+                            <Shadow Offset="0,5" Radius="10" Opacity="0.1" Brush="Black" />
+                        </Border.Shadow>
+
+                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
+                            <Border Grid.Column="0" 
+                                    WidthRequest="60" 
+                                    HeightRequest="60" 
+                                    StrokeShape="RoundRectangle 30" 
+                                    Stroke="LightGray" 
+                                    StrokeThickness="2">
+                                <Image Source="{Binding FotoPerfilPath, TargetNullValue='paciente_placeholder.png'}" 
+                                       Aspect="AspectFill" 
+                                       Margin="-1" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding Nome}" FontAttributes="Bold" FontSize="18" TextColor="Black" />
+                                <Label Text="{Binding IdadeFormatada, StringFormat='Idade: {0}'}" FontSize="13" TextColor="Gray" />
+                                <Label Text="{Binding ResumoTratamentos}" FontSize="13" TextColor="Gray" />
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="2" 
+                                             VerticalOptions="Center" 
+                                             HorizontalOptions="End"
+                                             IsVisible="{Binding TemAgendamento}">
+
+                                <Label Text="Próximo" 
+           TextColor="{DynamicResource Primary}" 
+           FontAttributes="Bold" 
+           HorizontalTextAlignment="Center" />
+
+                                <Label Text="{Binding ProximaData}" 
+           FontSize="14" 
+           TextColor="Black" 
+           HorizontalTextAlignment="Center" />
+
+                                <Label Text="{Binding ProximoHorario}" 
+           FontSize="14" 
+           TextColor="Black" 
+           HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2" Text="+" FontSize="30" HeightRequest="65" WidthRequest="65" CornerRadius="32" BackgroundColor="{DynamicResource SecondaryDark}" TextColor="White" VerticalOptions="End" HorizontalOptions="End" Margin="0,0,10,20" Command="{Binding NavegarParaCadastroCommand}">
+            <Button.Shadow>
+                <Shadow Offset="0,4" Radius="10" Opacity="0.3" Brush="Black" />
+            </Button.Shadow>
+        </Button>
+    </Grid>
+</ContentPage>

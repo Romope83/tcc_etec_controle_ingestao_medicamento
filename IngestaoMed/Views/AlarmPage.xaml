@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodels="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.UI.Views.AlarmPage"
+             x:DataType="viewmodels:AlarmeViewModel"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#F8F9FA">
+
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20, 15, 20, 15" RowSpacing="10">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="2" HorizontalOptions="Center">
+            <Label Text="ALERTA DE MEDICAMENTO" 
+                   FontSize="22" 
+                   FontAttributes="Bold" 
+                   TextColor="#DC3545" 
+                   HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Spacing="12">
+
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="12" Margin="0,2">
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="Status do Alarme" 
+               FontSize="14" 
+               FontAttributes="Bold" 
+               TextColor="{DynamicResource Primary}" 
+               HorizontalTextAlignment="Center" />
+
+                        <Label Text="{Binding TempoContador}" 
+       FontSize="36" 
+       FontAttributes="Bold" 
+       HorizontalTextAlignment="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding EstaAtrasado}" Value="True">
+                                    <Setter Property="TextColor" Value="Red" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding EstaAtrasado}" Value="False">
+                                    <Setter Property="TextColor" Value="{DynamicResource SecondaryDark}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+
+                <Border Padding="12" 
+                        StrokeShape="RoundRectangle 15" 
+                        StrokeThickness="0" 
+                        BackgroundColor="White">
+                    <Border.Shadow>
+                        <Shadow Offset="0,4" Radius="8" Opacity="0.08" Brush="Black" />
+                    </Border.Shadow>
+
+                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="15">
+                        <Border Grid.Column="0" 
+                                WidthRequest="55" 
+                                HeightRequest="55" 
+                                StrokeShape="RoundRectangle 27.5" 
+                                StrokeThickness="0">
+                            <Image Source="{Binding PacienteAtual.FotoPerfilPath, TargetNullValue='paciente_placeholder.png'}" Aspect="AspectFill" />
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label Text="Paciente" FontSize="11" TextColor="Gray" />
+                            <Label Text="{Binding PacienteAtual.Nome, TargetNullValue='Carregando...'}" FontSize="16" FontAttributes="Bold" TextColor="Black" />
+                            <Label Text="{Binding PacienteAtual.DataNascimento, StringFormat='Nasc: {0:dd/MM/yyyy}'}" FontSize="12" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <Border Padding="15" 
+                        StrokeShape="RoundRectangle 15" 
+                        StrokeThickness="0" 
+                        BackgroundColor="White">
+                    <Border.Shadow>
+                        <Shadow Offset="0,4" Radius="8" Opacity="0.08" Brush="Black" />
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+
+                        <VerticalStackLayout Spacing="1">
+                            <Label Text="{Binding MedicamentoAtual.NomeComercial, TargetNullValue='Carregando...'}" 
+                                   FontSize="22" 
+                                   FontAttributes="Bold" 
+                                   TextColor="Black" 
+                                   HorizontalTextAlignment="Center" />
+
+                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
+                                <Label Text="Horário original:" FontSize="13" TextColor="Gray" />
+                                <Label Text="{Binding AgendamentoAtual.HorarioOriginal, StringFormat='{0:HH:mm}'}" FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Primary}" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+
+                        <Border WidthRequest="160" 
+                                HeightRequest="110" 
+                                StrokeShape="RoundRectangle 12" 
+                                StrokeThickness="0">
+                            <Image Source="{Binding MedicamentoAtual.FotoPath, TargetNullValue='remedio_placeholder.png'}" Aspect="AspectFit" />
+                        </Border>
+
+                        <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                                <Label Text="{Binding VinculoAtual.Dosagem}" FontSize="16" FontAttributes="Bold" TextColor="Black" />
+                                <Label Text="{Binding MedicamentoAtual.UnidadeDosagem, StringFormat='({0})'}" FontSize="16" FontAttributes="Bold" TextColor="Black" />
+                                <Label Text="-" FontSize="16" FontAttributes="Bold" TextColor="Black" />
+                                <Label Text="{Binding MedicamentoAtual.FormaIngestao}" FontSize="16" FontAttributes="Bold" TextColor="Black" />
+                            </HorizontalStackLayout>
+
+                            <Label Text="Verifique as recomendações médicas antes de ingerir." 
+                                   FontSize="14" 
+                                   TextColor="Gray" 
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="15" Margin="0,5,0,5">
+
+            <Button Grid.Column="0" 
+                    Text="Soneca" 
+                    Command="{Binding AdiarSonecaCommand}"
+                    BackgroundColor="{DynamicResource Secondary}" 
+                    TextColor="White" 
+                    FontAttributes="Bold" 
+                    HeightRequest="50" 
+                    CornerRadius="12">
+                <Button.Shadow>
+                    <Shadow Offset="0,3" Radius="4" Opacity="0.15" Brush="Black" />
+                </Button.Shadow>
+            </Button>
+
+            <Button Grid.Column="1" 
+                    Text="Tomei" 
+                    Command="{Binding ConfirmarIngestaoCommand}"
+                    BackgroundColor="{DynamicResource Primary}" 
+                    TextColor="White" 
+                    FontAttributes="Bold" 
+                    HeightRequest="50" 
+                    CornerRadius="12">
+                <Button.Shadow>
+                    <Shadow Offset="0,3" Radius="4" Opacity="0.15" Brush="Black" />
+                </Button.Shadow>
+            </Button>
+
+        </Grid>
+
+    </Grid>
+</ContentPage>

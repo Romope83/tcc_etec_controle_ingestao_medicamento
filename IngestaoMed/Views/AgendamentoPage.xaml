@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.AgendamentoPage"
+             x:DataType="vm:AgendamentoViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F8F9FA">
+
+    <ContentPage.Resources>
+        <Style TargetType="Entry">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="#333333" />
+                                <Setter Property="BackgroundColor" Value="#F0F0F0" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="Black" />
+                                <Setter Property="BackgroundColor" Value="White" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="#333333" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="Black" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TimePicker">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="#333333" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="TextColor" Value="Black" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                <Button Text="‹" 
+                        FontSize="30" 
+                        BackgroundColor="Transparent" 
+                        TextColor="{StaticResource Primary}" 
+                        Padding="0" 
+                        HeightRequest="40"
+                        WidthRequest="40"
+                        Command="{Binding VoltarCommand}" />
+
+                <Label FontSize="22" FontAttributes="Bold" TextColor="{StaticResource Primary}" VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding EstaEditando}" Value="False">
+                            <Setter Property="Text" Value="Novo Agendamento" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding EstaEditando}" Value="True">
+                            <Setter Property="Text" Value="Editar Agendamento" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </HorizontalStackLayout>
+
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding TemMedicamentoSelecionado, Converter={toolkit:InvertedBoolConverter}}">
+                <Border StrokeShape="RoundRectangle 25" StrokeThickness="0" BackgroundColor="White" Padding="10,0" HeightRequest="50">
+                    <Border.Shadow>
+                        <Shadow Offset="0,2" Radius="5" Opacity="0.1" Brush="Black" />
+                    </Border.Shadow>
+                    <Grid ColumnDefinitions="Auto, *">
+                        <Label Text="🔍" VerticalOptions="Center" Margin="10,0" />
+                        <Entry Grid.Column="1" 
+                               Text="{Binding TextoBusca}"
+                               Placeholder="Pesquisar remédio..." 
+                               VerticalOptions="Center">
+                            <Entry.Behaviors>
+                                <toolkit:EventToCommandBehavior EventName="TextChanged" Command="{Binding BuscarMedicamentosCommand}" />
+                            </Entry.Behaviors>
+                        </Entry>
+                    </Grid>
+                </Border>
+
+                <CollectionView ItemsSource="{Binding SugestoesBusca}" 
+                                IsVisible="{Binding SugestoesBusca.Count, Converter={toolkit:IntToBoolConverter}}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="15" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Medicamento">
+                            <Border Padding="10" StrokeShape="RoundRectangle 15" BackgroundColor="White" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AgendamentoViewModel}}, Path=SelecionarMedicamentoCommand}" 
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto, *" ColumnSpacing="15">
+                                    <Border Grid.Column="0" WidthRequest="50" HeightRequest="50" StrokeShape="RoundRectangle 25" StrokeThickness="0">
+                                        <Image Source="{Binding FotoPath, TargetNullValue='remedio_placeholder.png'}" Aspect="AspectFill" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Label Text="{Binding NomeComercial}" FontAttributes="Bold" FontSize="16" />
+                                        <HorizontalStackLayout Spacing="5">
+                                            <Label Text="{Binding FormaIngestao}" FontSize="12" TextColor="Gray" />
+                                            <Label Text="•" FontSize="12" TextColor="Gray" />
+                                            <Label Text="{Binding Dosagem}" FontSize="12" TextColor="Gray" />
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+
+            <Border StrokeShape="RoundRectangle 15" Padding="15" BackgroundColor="#E3F2FD" StrokeThickness="0"
+                    IsVisible="{Binding TemMedicamentoSelecionado}">
+                <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
+                    <Border Grid.Column="0" WidthRequest="60" HeightRequest="60" StrokeShape="RoundRectangle 30">
+                        <Image Source="{Binding MedicamentoSelecionado.FotoPath, TargetNullValue='remedio_placeholder.png'}" Aspect="AspectFill" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="{Binding MedicamentoSelecionado.NomeComercial}" FontAttributes="Bold" FontSize="18" TextColor="{StaticResource Primary}" />
+                        <Label Text="{Binding MedicamentoSelecionado.FormaIngestao}" FontSize="13" TextColor="Gray" />
+                        <Label Text="{Binding MedicamentoSelecionado.UnidadeDosagem, StringFormat='Unidade: {0}'}" FontSize="12" TextColor="Gray" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2" Text="Alterar" Command="{Binding AlterarMedicamentoCommand}"
+                            IsVisible="{Binding PossuiDosesGeradas, Converter={toolkit:InvertedBoolConverter}}"
+                            FontSize="10" HeightRequest="30" BackgroundColor="White" TextColor="{StaticResource Primary}" BorderColor="{StaticResource Primary}" BorderWidth="1" />
+                </Grid>
+            </Border>
+
+            <VerticalStackLayout Spacing="15" IsVisible="{Binding TemMedicamentoSelecionado}">
+
+                <Line Stroke="LightGray" X2="400" HorizontalOptions="Center" Margin="0,5" />
+
+                <HorizontalStackLayout Spacing="10">
+                    <Switch x:Name="swAtivo" IsToggled="{Binding Ativado}" OnColor="{StaticResource Primary}" />
+                    <Label VerticalOptions="Center" TextColor="Gray">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding Source={x:Reference swAtivo}, Path=IsToggled}" Value="True">
+                                <Setter Property="Text" Value="Agendamento Ativo" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding Source={x:Reference swAtivo}, Path=IsToggled}" Value="False">
+                                <Setter Property="Text" Value="Agendamento Desativado" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </HorizontalStackLayout>
+
+                <VerticalStackLayout Spacing="15" IsEnabled="{Binding PossuiDosesGeradas, Converter={toolkit:InvertedBoolConverter}}">
+                    <VerticalStackLayout Spacing="5">
+                        <HorizontalStackLayout Spacing="3">
+                            <Label Text="Dose" TextColor="Gray" />
+                            <Label Text="{Binding MedicamentoSelecionado.UnidadeDosagem, StringFormat='({0})'}" 
+                                   TextColor="Gray" 
+                                   IsVisible="{Binding TemMedicamentoSelecionado}" />
+                        </HorizontalStackLayout>
+                        <Entry Text="{Binding Dose}" Placeholder="Ex: 2" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Intervalo (horas/minutos)" TextColor="Gray" />
+                        <Entry Text="{Binding IntervaloHoras}" Keyboard="Numeric" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <HorizontalStackLayout Spacing="15" Margin="0,0,0,5">
+                            <RadioButton Content="Minutos" 
+                                         GroupName="UnidadeTempo" 
+                                         IsChecked="{Binding EhTempoEmHoras, Converter={toolkit:InvertedBoolConverter}}" />
+                            <RadioButton Content="Horas" 
+                                         GroupName="UnidadeTempo" 
+                                         IsChecked="{Binding EhTempoEmHoras}" />
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="Tolerância de Atraso:" TextColor="Gray" />
+                            <Label Text="{Binding Tolerancia, StringFormat='{0} minutos'}" TextColor="{StaticResource Primary}" FontAttributes="Bold">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding EhTempoEmHoras}" Value="True">
+                                        <Setter Property="Text" Value="{Binding Tolerancia, StringFormat='{0} horas'}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </HorizontalStackLayout>
+
+                        <Slider Minimum="0" 
+                                Maximum="120" 
+                                Value="{Binding Tolerancia}"
+                                MinimumTrackColor="{StaticResource Primary}">
+                            <Slider.Behaviors>
+                                <toolkit:NumericValidationBehavior />
+                            </Slider.Behaviors>
+                        </Slider>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Início" TextColor="Gray" />
+                        <Grid ColumnDefinitions="auto, *" ColumnSpacing="10">
+                            <DatePicker Date="{Binding DataInicio}" 
+                                        Format="dd/MM/yyyy" 
+                                        VerticalOptions="Center" />
+                            <TimePicker Grid.Column="1" 
+                                        Time="{Binding HoraInicio}" 
+                                        Format="HH:mm" 
+                                        VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Fim" TextColor="Gray" />
+                        <Grid ColumnDefinitions="auto, *" ColumnSpacing="10">
+                            <DatePicker Date="{Binding DataFim}" 
+                                        Format="dd/MM/yyyy" 
+                                        VerticalOptions="Center" />
+                            <TimePicker Grid.Column="1" 
+                                        Time="{Binding HoraFim}" 
+                                        Format="HH:mm" 
+                                        VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <Button Text="Salvar Agendamento" 
+                        Command="{Binding SalvarAgendamentoCommand}" 
+                        IsVisible="{Binding PossuiDosesGeradas, Converter={toolkit:InvertedBoolConverter}}"
+                        BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="10" HeightRequest="45" />
+
+                <Border Stroke="{StaticResource Secondary}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="15" BackgroundColor="{StaticResource Secondary}"
+                        IsVisible="{Binding PossuiDosesGeradas}">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <Label Text="DOSES PREVISTAS" FontAttributes="Bold" TextColor="White" VerticalOptions="Center" />
+                            <Button Grid.Column="1" Text="🗑️" Command="{Binding DeletarDosesCommand}" IsVisible="{Binding PodeDeletarDoses}"
+                                    BackgroundColor="Transparent" TextColor="White" FontSize="20" />
+                        </Grid>
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding DosesGeradas}" Spacing="5">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:Agendamento">
+                                    <Border Stroke="LightGray" StrokeThickness="0.5" Padding="10" BackgroundColor="White" StrokeShape="RoundRectangle 10">
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <Label Text="{Binding ProximoAlarme, StringFormat='{0:dd/MM/yyyy HH:mm}'}" 
+                                                   VerticalOptions="Center" 
+                                                   TextColor="#333333" />
+
+                                            <Label Grid.Column="1" 
+                                                   FontAttributes="Bold" 
+                                                   VerticalOptions="Center"
+                                                   TextColor="#2196F3" 
+                                                   Text="⏳ Pendente">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding Status}" Value="Tomado">
+                                                        <Setter Property="TextColor" Value="Green" />
+                                                        <Setter Property="Text" Value="✅ Tomado" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger TargetType="Label" Binding="{Binding Atrasado}" Value="True">
+                                                        <Setter Property="TextColor" Value="Red" />
+                                                        <Setter Property="Text" Value="❌ Perdido" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

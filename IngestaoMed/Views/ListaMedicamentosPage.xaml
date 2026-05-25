@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             xmlns:models="clr-namespace:IngestaoMed.Core.Models;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.ListaMedicamentosPage"
+             x:DataType="vm:ListaMedicamentosViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F8F9FA">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding CarregarMedicamentosCommand}" />
+    </ContentPage.Behaviors>
+
+    <Grid RowDefinitions="Auto, *" Padding="20, 50, 20, 0" RowSpacing="15">
+
+        <Border Grid.Row="0" StrokeShape="RoundRectangle 25" StrokeThickness="0" BackgroundColor="White" Padding="10,0" HeightRequest="50">
+            <Border.Shadow>
+                <Shadow Offset="0,2" Radius="5" Opacity="0.1" Brush="Black" />
+            </Border.Shadow>
+            <Grid ColumnDefinitions="Auto, *">
+                <Label Text="🔍" VerticalOptions="Center" Margin="10,0" />
+                <Entry Grid.Column="1" 
+                       Text="{Binding TextoBusca}"
+                       Placeholder="Pesquisar medicamento..." 
+                       PlaceholderColor="Gray" 
+                       VerticalOptions="Center" 
+                       BackgroundColor="Transparent" />
+            </Grid>
+        </Border>
+
+        <CollectionView Grid.Row="1" 
+                        ItemsSource="{Binding Medicamentos}"
+                        SelectionMode="None"
+                        VerticalScrollBarVisibility="Never">
+
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="15" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Spacing="10" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,50,0,0">
+                    <Label Text="Nenhum medicamento cadastrado." HorizontalTextAlignment="Center" TextColor="Gray" FontSize="16" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Medicamento">
+                    <Border Margin="0,2,0,4" 
+                            Padding="15" 
+                            StrokeShape="RoundRectangle 15" 
+                            StrokeThickness="0" 
+                            BackgroundColor="White">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListaMedicamentosViewModel}}, Path=NavegarParaCadastroCommand}"
+                                CommandParameter="{Binding Id}" />
+                        </Border.GestureRecognizers>
+                        <Border.Shadow>
+                            <Shadow Offset="0,4" Radius="8" Opacity="0.06" Brush="Black" />
+                        </Border.Shadow>
+
+                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
+
+                            <Border Grid.Column="0" 
+                                    WidthRequest="55" 
+                                    HeightRequest="55" 
+                                    StrokeShape="RoundRectangle 27.5" 
+                                    Stroke="LightGray" 
+                                    StrokeThickness="1">
+                                <Image Source="{Binding FotoPath, TargetNullValue='remedio_placeholder.png'}" 
+                                       Aspect="AspectFill" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="{Binding NomeComercial}" FontAttributes="Bold" FontSize="17" TextColor="Black" />
+
+                                <HorizontalStackLayout Spacing="6">
+                                    <Label Text="{Binding Dosagem}" TextColor="Gray" FontSize="13" />
+                                    <Label Text="{Binding UnidadeDosagem}" TextColor="Gray" FontSize="13" />
+                                    <Label Text="|" TextColor="LightGray" FontSize="13" />
+                                    <Label Text="{Binding FormaIngestao}" TextColor="Gray" FontSize="13" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+
+                            <Label Grid.Column="2" 
+                                   Text="›" 
+                                   FontSize="26" 
+                                   TextColor="LightGray" 
+                                   VerticalOptions="Center" 
+                                   HorizontalOptions="End"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="1" 
+                Text="+" 
+                FontSize="30" 
+                HeightRequest="65" 
+                WidthRequest="65" 
+                CornerRadius="32" 
+                BackgroundColor="{StaticResource Primary}" 
+                TextColor="White" 
+                VerticalOptions="End" 
+                HorizontalOptions="End" 
+                Margin="0,0,10,20" 
+                Command="{Binding NavegarParaCadastroCommand}">
+            <Button.Shadow>
+                <Shadow Offset="0,4" Radius="10" Opacity="0.3" Brush="Black" />
+            </Button.Shadow>
+        </Button>
+
+    </Grid>
+</ContentPage>

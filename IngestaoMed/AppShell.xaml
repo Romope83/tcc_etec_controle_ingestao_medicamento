@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="IngestaoMed.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:IngestaoMed"
+    xmlns:views="clr-namespace:IngestaoMed.Views" 
+    xmlns:ui="clr-namespace:IngestaoMed.UI.Views" 
+    xmlns:onboarding="clr-namespace:IngestaoMed.Views.Onboarding"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="IngestaoMed"
+    FlyoutBackgroundColor="{DynamicResource Secondary}"
+    FlyoutBehavior="Flyout"
+    IsVisible="Collapse">
+
+    <ShellContent
+        Title="Carregando"
+        ContentTemplate="{DataTemplate onboarding:SplashPage}"
+        Route="SplashPage"
+        FlyoutItemIsVisible="False" />
+
+    <ShellContent
+        Title="Boas-vindas"
+        ContentTemplate="{DataTemplate onboarding:WelcomePage}"
+        Route="WelcomePage"
+        FlyoutItemIsVisible="False" />
+
+    <ShellContent
+        Title="Cadastro"
+        ContentTemplate="{DataTemplate views:CadastroPage}"
+        Route="CadastroPage" 
+        FlyoutItemIsVisible="False"/>
+
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Route="LoginPage" 
+        FlyoutItemIsVisible="False"/>
+
+    <FlyoutItem Title="Painel Principal" FlyoutIcon="tratamento_icone.png">
+        <Tab Title="Pacientes" Icon="paciente_icone_v2.png">
+            <ShellContent ContentTemplate="{DataTemplate views:ListaPacientesPage}" Route="ListaPacientesPage" />
+        </Tab>
+
+        <Tab Title="Remédios" Icon="pilula_icone_v2.png">
+            <ShellContent ContentTemplate="{DataTemplate views:ListaMedicamentosPage}" Route="ListaMedicamentoPage" />
+        </Tab>
+
+        <Tab Title="Tratamentos" Icon="estetoscopio_icone.png">
+            <ShellContent ContentTemplate="{DataTemplate views:ListaTratamentosPage}" Route="ListaTratamentoPage" />
+        </Tab>
+    </FlyoutItem>
+
+    <ShellContent
+        Title="Cadastrar Medicamento"
+        ContentTemplate="{DataTemplate views:MedicamentoPage}"
+        Route="CadastroMedPage" 
+        FlyoutItemIsVisible="False"/>
+
+    <ShellContent
+        Title="Configurar Cuidador"
+        ContentTemplate="{DataTemplate onboarding:CuidadorPage}"
+        Route="RegisterCuidadorPage" 
+        FlyoutItemIsVisible="True"/>
+
+    <MenuItem Text="Logout"
+          Command="{Binding LogoutCommand}"
+          IconImageSource="icon_logout.png" />
+
+</Shell>

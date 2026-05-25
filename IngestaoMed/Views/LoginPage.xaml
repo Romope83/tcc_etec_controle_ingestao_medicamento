@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IngestaoMed.Core.ViewModels;assembly=IngestaoMed.Core"
+             x:Class="IngestaoMed.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.FlyoutBehavior="Disabled"
+             BackgroundColor="White">
+
+    <ScrollView VerticalOptions="Center">
+        <VerticalStackLayout Padding="30" Spacing="25">
+
+            <VerticalStackLayout HorizontalOptions="Center" Margin="0,0,0,10">
+                <Image Source="remedio_placeholder.png" 
+                       HeightRequest="120" 
+                       WidthRequest="120"
+                       Aspect="AspectFit" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="15" Margin="0,10,0,0" IsVisible="{Binding ExibirOpcoesPerfil}">
+
+                <Button Text="SOU PACIENTE" 
+                        Command="{Binding NavegarParaPacienteCommand}" 
+                        BackgroundColor="{StaticResource Primary}" 
+                        TextColor="White"
+                        CornerRadius="25"
+                        HeightRequest="55"
+                        FontAttributes="Bold"/>
+
+                <Button Text="SOU CUIDADOR" 
+                        Command="{Binding MostrarLoginCuidadorCommand}" 
+                        BackgroundColor="{StaticResource SecondaryDark}" 
+                        TextColor="White"
+                        CornerRadius="25"
+                        HeightRequest="55"
+                        FontAttributes="Bold"/>
+
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="15" IsVisible="{Binding ExibirCamposLogin}">
+
+                <Label Text="Acesso do Cuidador" 
+                       FontSize="16" 
+                       TextColor="{StaticResource Primary}" 
+                       HorizontalOptions="Center"
+                       FontAttributes="Bold"
+                       Margin="0,10,0,0"/>
+
+                <Entry Placeholder="E-mail" 
+                       Text="{Binding Email}" 
+                       Keyboard="Email" />
+
+                <Entry Placeholder="Senha" 
+                       Text="{Binding Senha}" 
+                       IsPassword="True" />
+
+                <Button Text="Entrar" 
+                        Command="{Binding EntrarCommand}" 
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        CornerRadius="25"
+                        HeightRequest="55"
+                        FontAttributes="Bold"
+                        Margin="0,10,0,0" />
+
+                <Button Text="Voltar para seleção de perfil"
+                        Command="{Binding VoltarParaPerfilCommand}"
+                        FontSize="12"
+                        TextColor="{StaticResource Gray600}"
+                        BackgroundColor="Transparent"
+                        Padding="0"
+                        HorizontalOptions="Center"
+                        Margin="0,10,0,0"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
